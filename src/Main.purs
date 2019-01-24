@@ -6,7 +6,8 @@ import Effect (Effect)
 import React (ReactClass, statelessComponent, component, createLeafElement, ReactElement)
 import ReactNative.API (registerComponent)
 import ReactNative.Components.Text (text_)
-import ReactNative.Components.View (view)
+import ReactNative.Components.View (view, view_)
+import ReactNative.Components.Button (button_)
 import ReactNative.Styles (Styles, staticStyles, marginTop)
 -- import Dispatcher.React (getProps, getState, modifyState, renderer, saveRef, withRef)
 import Dispatcher.React (renderer)
@@ -15,7 +16,12 @@ itemsListClass :: ReactClass {}
 itemsListClass = component "ItemsList" spec
   where
     spec this = do
-      let render _ = text_ "Hello again"
+      let render _ =
+            view_
+            [ button_ "A Button"
+            , text_ "Hello again"
+            ]
+
       pure {render: renderer render this , state: initialState}
 
 type ItemsListProps = {}
