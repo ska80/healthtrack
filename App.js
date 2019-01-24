@@ -7,7 +7,7 @@
  */
 
 import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, View} from 'react-native';
+import {Platform, StyleSheet, FlatList, Text, View, Alert, Button} from 'react-native';
 
 const instructions = Platform.select({
   ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
@@ -16,21 +16,55 @@ const instructions = Platform.select({
     'Shake or press menu button for dev menu',
 });
 
-type Props = {};
-export default class App extends Component<Props> {
+class TheList extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      items: [{key: 'a', text: "aaaa"},
+              {key: 'b', text: "bbbb"}]
+    };
+  }
+
+  add() {
+    console.log(this);
+    var newList = this.state.items.slice(0);
+    const newItem = {key: "FACE", text: "FOO"};
+    newList.unshift(newItem);
+    this.setState({items: newList });
+  }
+
   render() {
     return (
-      <View style={styles.container}>
-        <Text style={styles.welcome}>Welcome to React Native!</Text>
-        <Text style={styles.instructions}>To get started, edit App.js</Text>
-        <Text style={styles.instructions}>{instructions}</Text>
-      </View>
+        <View>
+        <Button
+      onPress={()=> this.add()}
+      title="press"
+        />
+        <FlatList
+      style={styles.welcome}
+      data={this.state.items}
+      renderItem={({item}) => <Text>{item.text}</Text>}
+        />
+        </View>
     );
   }
+
+}
+
+export default class App extends Component {
+  render() {
+    return (
+        <View style={styles.container}>
+        <TheList/>
+        </View>
+    );
+  }
+
 }
 
 const styles = StyleSheet.create({
   container: {
+    marginTop: 30,
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
@@ -39,7 +73,7 @@ const styles = StyleSheet.create({
   welcome: {
     fontSize: 20,
     textAlign: 'center',
-    margin: 10,
+    margin: 20,
   },
   instructions: {
     textAlign: 'center',
