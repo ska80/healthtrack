@@ -2310,7 +2310,7 @@ var PS = {};
               return ReactNative_Components_Text.text_("item");
           };
           var render = function (v1) {
-              return ReactNative_Components_View.view_([ ReactNative_Components_Button.button("A Button")(v(Data_Function["const"](ToggleState.value))), ReactNative_Components_ListView.listView(ReactNative_Components_ListView.listViewDataSource(v1.state.items))(ReactNative_Components_Text.text_), ReactNative_Components_Text.text_("current state: " + Data_Show.show(Data_Show.showBoolean)(v1.state.on)) ]);
+              return ReactNative_Components_View.view_([ ReactNative_Components_Button.button("A Button")(v(Data_Function["const"](ToggleState.value))), ReactNative_Components_Text.text_("current state: " + Data_Show.show(Data_Show.showBoolean)(v1.state.on)), ReactNative_Components_ListView.listView(ReactNative_Components_ListView.listViewDataSource(v1.state.items))(ReactNative_Components_Text.text_) ]);
           };
           return Control_Applicative.pure(Effect.applicativeEffect)({
               render: Dispatcher_React.renderer(render)($$this),

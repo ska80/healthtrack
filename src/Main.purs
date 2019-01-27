@@ -45,8 +45,8 @@ itemsListClass = component "ItemsList" spec
         render {state,props} =
           view_
              [ button "A Button" $ d (const ToggleState)
-             , listView (listViewDataSource state.items) text_
              , text_ $ "current state: " <> (show state.on)
+             , listView (listViewDataSource state.items) text_
              ]
         rowRender x = text_ "item"
 
