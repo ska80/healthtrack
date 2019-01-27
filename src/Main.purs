@@ -3,38 +3,44 @@ module Main where
 import Prelude
 
 import Effect (Effect)
-import React (ReactClass, statelessComponent, component, createLeafElement, ReactElement, getState)
+import React (ReactClass, statelessComponent, component, createLeafElement, ReactElement -- , getState
+             )
 import ReactNative.API (registerComponent)
 import ReactNative.Components.Text (text_)
 import ReactNative.Components.View (view, view_)
-import ReactNative.Components.Button (button_)
+import ReactNative.Components.Button (button)
 import ReactNative.Components.ListView (listView, listViewDataSource, ListViewDataSource)
 import ReactNative.Styles (Styles, staticStyles, marginTop)
 -- import Dispatcher.React (getProps, getState, modifyState, renderer, saveRef, withRef)
-import Dispatcher.React (renderer -- , getState
-                        )
--- import Debug.Trace
+
+import Dispatcher (action, affAction, mkDispatch1, Dispatch1(..))
+import Dispatcher.React (modifyState, renderer)
+
+data Action = ToggleState
 
 itemsListClass :: ReactClass {}
 itemsListClass = component "ItemsList" spec
   where
+
+    eval ToggleState =
+      modifyState (\state -> state { on = not state.on })
+
     spec this = do
-      pure { render: render <$> getState this -- renderer render this
-           , state: initialState}
+      pure { render: renderer render this
+           , state: initialState }
       where
-        -- foo = spy "this = " this
-        render state =
+        de = affAction this <<< eval
+        (Dispatch1 d) = mkDispatch1 de
+        render {state,props} =
           let
             ds = (listViewDataSource [])
-          -- state <- getState this'
           in
-          view_
-            [ button_ "A Button"
-            , listView state.dataSource rowRender
-            , text_ "Hello again"
-            ]
+           view_
+             [ button "A Button" $ d \x -> ToggleState
+             , listView state.dataSource rowRender
+             , text_ (show state.on)
+             ]
         rowRender x = text_ "item"
-      -- pure {render: renderer render this, state: initialState}
 
 type ItemsListProps = {}
 
@@ -42,6 +48,7 @@ type State =
   { nextId :: Int
   , items :: Array String
   , dataSource :: ListViewDataSource String
+  , on :: Boolean
   }
 
 initialState :: State
@@ -49,6 +56,7 @@ initialState =
   { nextId: 0
   , items: []
   , dataSource: listViewDataSource []
+  , on: false
   }
 
 itemsList :: ItemsListProps -> ReactElement
