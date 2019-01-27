@@ -16,6 +16,9 @@ import ReactNative.Styles (Styles, staticStyles, marginTop)
 import Dispatcher (action, affAction, mkDispatch1, Dispatch1(..))
 import Dispatcher.React (modifyState, renderer)
 
+import Data.Semigroup ((<>))
+import Data.Show (show)
+
 data Action = ToggleState
 
 itemsListClass :: ReactClass {}
@@ -36,9 +39,9 @@ itemsListClass = component "ItemsList" spec
             ds = (listViewDataSource [])
           in
            view_
-             [ button "A Button" $ d \x -> ToggleState
+             [ button "A Button" $ d (const ToggleState)
              , listView state.dataSource rowRender
-             , text_ (show state.on)
+             , text_ $ "current state: " <> (show state.on)
              ]
         rowRender x = text_ "item"
 

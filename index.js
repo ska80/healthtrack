@@ -2170,6 +2170,7 @@ var PS = {};
   var Control_Semigroupoid = PS["Control.Semigroupoid"];
   var Data_Function = PS["Data.Function"];
   var Data_HeytingAlgebra = PS["Data.HeytingAlgebra"];
+  var Data_Semigroup = PS["Data.Semigroup"];
   var Data_Show = PS["Data.Show"];
   var Dispatcher = PS["Dispatcher"];
   var Dispatcher_React = PS["Dispatcher.React"];
@@ -2222,9 +2223,7 @@ var PS = {};
           };
           var render = function (v1) {
               var ds = ReactNative_Components_ListView.listViewDataSource([  ]);
-              return ReactNative_Components_View.view_([ ReactNative_Components_Button.button("A Button")(v(function (x) {
-                  return ToggleState.value;
-              })), ReactNative_Components_ListView.listView(v1.state.dataSource)(rowRender), ReactNative_Components_Text.text_(Data_Show.show(Data_Show.showBoolean)(v1.state.on)) ]);
+              return ReactNative_Components_View.view_([ ReactNative_Components_Button.button("A Button")(v(Data_Function["const"](ToggleState.value))), ReactNative_Components_ListView.listView(v1.state.dataSource)(rowRender), ReactNative_Components_Text.text_("current state: " + Data_Show.show(Data_Show.showBoolean)(v1.state.on)) ]);
           };
           return Control_Applicative.pure(Effect.applicativeEffect)({
               render: Dispatcher_React.renderer(render)($$this),
