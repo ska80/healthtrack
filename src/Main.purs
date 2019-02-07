@@ -11,8 +11,10 @@ import ReactNative.Components.Text (text_)
 import ReactNative.Components.View (view, view_)
 import ReactNative.Components.Button (button)
 import ReactNative.Components.ListView (listView, listViewDataSource)
+import ReactNative.Components.TextInput ( textInput')
 import ReactNative.Styles (Styles, staticStyles, marginTop)
--- import Dispatcher.React (getProps, getState, modifyState, renderer, saveRef, withRef)
+import ReactNative.PropTypes (center, unsafeRef)
+import ReactNative.Styles (Styles, flex, height, marginTop, padding, paddingLeft, staticStyles, width)
 
 import Dispatcher (-- action,
                    affAction, mkDispatch1, Dispatch1(..))
@@ -22,47 +24,57 @@ import Dispatcher.React (modifyState, renderer)
 -- import Data.Show (show)
 -- import Data.Array
 import Data.Array ((:))
+import ReactNative.Styles (Styles, flex, height, marginTop, padding, paddingLeft, staticStyles, width)
+import ReactNative.Styles.Flex (alignItems, flexDirection, row)
+import ReactNative.Styles.Text (fontSize)
 
-
-data Action = ToggleState
+data Action = AddItem | InputChange String
 
 itemsListClass :: ReactClass {}
 itemsListClass = component "ItemsList" spec
   where
-
-    eval ToggleState =
-      modifyState (\state -> state { on = not state.on
-                                   , items = ("item: " <> show state.nextId) : state.items
-                                   , nextId = state.nextId + 1
-                                   })
+    eval input =
+      case input of
+        AddItem ->
+          modifyState (\state ->
+                        state { items = ("item: " <> state.input) : state.items
+                              , nextId = state.nextId + 1
+                              })
+        InputChange str ->
+          modifyState (\state ->
+                        state { input = str })
 
     spec this = do
       pure { render: renderer render this
-           , state: initialState }
+           , state: initialState
+           }
       where
         de = affAction this <<< eval
         (Dispatch1 d) = mkDispatch1 de
-        render {state,props} =
+        render {state, props} =
           view_
-             [ button "A Button" $ d (const ToggleState)
-             , text_ $ "current state: " <> (show state.on)
+             [ textInput'
+                { onChange: d $ InputChange <<< _.nativeEvent.text
+                , style: sheet.textInput
+                , placeholder: "Enter item to log..."
+                }
+             , button "Add Log Item" $ d (const AddItem)
              , listView (listViewDataSource state.items) text_
              ]
-        rowRender x = text_ "item"
 
 type ItemsListProps = {}
 
 type State =
   { nextId :: Int
   , items :: Array String
-  , on :: Boolean
+  , input :: String
   }
 
 initialState :: State
 initialState =
   { nextId: 0
   , items: []
-  , on: false
+  , input: ""
   }
 
 itemsList :: ItemsListProps -> ReactElement
@@ -78,13 +90,23 @@ app = statelessComponent render
 
 sheet :: {
     container :: Styles
+  , textInput :: Styles
 }
+
 sheet = {
   container: staticStyles [
       marginTop 64
+    , padding 3
+    , paddingLeft 8
+    -- , flexDirection row
+    , alignItems center
+  ],
+  textInput: staticStyles [
+      fontSize 15
+    , height 30
+    -- , flex 1
   ]
 }
-
 
 main :: Effect Unit
 main = do
