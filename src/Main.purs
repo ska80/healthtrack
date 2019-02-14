@@ -3,11 +3,11 @@ import Prelude (($), (+), (<>), show, identity)
 -- import Effect.Console
 -- import Effect
 import Data.List (List(..), (:))
-import Data.Maybe (Maybe(..), fromMaybe, maybe)
+import Data.Maybe (Maybe(..), maybe)
 import Data.Nullable (toMaybe)
 import React.Basic (Self, StateUpdate(..), JSX, make, runUpdate, Component, createComponent)
-import React.Basic.Native (text_, text, string, view_, button, view, textInput)
-import React.Basic.Events (EventFn, SyntheticEvent, unsafeEventFn, merge)
+import React.Basic.Native (text, string, button, view, textInput)
+import React.Basic.Events (EventFn, SyntheticEvent, unsafeEventFn)
 import React.Basic.DOM (css)
 import React.Basic.DOM.Events (capture_, capture)
 import Unsafe.Coerce (unsafeCoerce)
@@ -28,9 +28,6 @@ initialVal :: State
 initialVal = { nextId: 0,
                textVal: Nothing,
                items: Nil }
-
--- main :: RB.JSX
--- main = RN.text_ [ RN.string "hey" ]
 
 main :: JSX
 main = make comp
@@ -62,15 +59,15 @@ main = make comp
                          , value: maybe "" identity self.state.textVal
                          , onSubmitEditing: (capture_ $ send self AddItem )
                          }
-             , button { title: "clickx"
+             , button { title: "save"
                       , key: "clickyButton"
                       , onPress: (capture_ $ send self AddItem )
                       }
              ]
            }
         where
-          setStateText event =
-            self.setState _ { textVal = event}
+          setStateText tv =
+            self.setState _ { textVal = tv }
 
 showDebugInfo :: Boolean
 -- showDebugInfo = false
