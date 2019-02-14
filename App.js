@@ -5,7 +5,7 @@ import * as Main from "./output/Main"
 export default class App extends React.Component {
   render() {
     return (
-        <View style={styles.container}>
+      <View style={styles.container} >
         {Main.main}
       </View>
     );

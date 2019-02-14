@@ -7,6 +7,7 @@ You can edit this file as you like.
 , dependencies =
     [ "effect"
     , "console"
+    , "react"
     , "react-basic"
     , "react-basic-native"
     , "typelevel-prelude"
