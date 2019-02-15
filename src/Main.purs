@@ -3,13 +3,16 @@ import Prelude (($), (+), (<>), show, identity)
 -- import Effect.Console
 -- import Effect
 import Data.List (List(..), (:))
+import Data.Array (fromFoldable)
 import Data.Maybe (Maybe(..), maybe)
+-- import Data.Tuple (Tuple(..))
 import Data.Nullable (toMaybe)
 import React.Basic (Self, StateUpdate(..), JSX, make, runUpdate, Component, createComponent)
-import React.Basic.Native (text, string, button, view, textInput)
 import React.Basic.Events (EventFn, SyntheticEvent, unsafeEventFn)
 import React.Basic.DOM (css)
 import React.Basic.DOM.Events (capture_, capture)
+import React.Basic.Native (text_, text, string, button, view, textInput, flatList)
+
 import Unsafe.Coerce (unsafeCoerce)
 
 comp :: Component {}
@@ -21,8 +24,10 @@ data Action
 type State =
   { nextId :: Int
   , textVal :: Maybe String
-  , items :: List String
+  , items :: List Item
   }
+
+type Item = {key :: String, val :: String }
 
 initialVal :: State
 initialVal = { nextId: 0,
@@ -37,8 +42,8 @@ main = make comp
       case _ of
         AddItem ->
           let
-            nextEntry :: String
-            nextEntry = show self.state.nextId <> ": " <> maybe "" identity self.state.textVal
+            nextEntry = { key: show self.state.nextId
+                        , val: maybe "" identity self.state.textVal }
           in
            Update $ self.state {
              items =  nextEntry : self.state.items,
@@ -47,6 +52,13 @@ main = make comp
              }
 
     send = runUpdate update
+
+    initialList :: List Item
+    initialList = (({key: "1", val: "ye"}) :  ({key: "2", val: "foo"}) : Nil)
+
+    initialArray :: Array Item
+    initialArray = fromFoldable initialList
+    -- initialArray = [{key: 1, val: "ye"}, {key: 2, val: "foo"}]
 
     render self =
       view { style: css {flexDirection: "column", padding: 100}
@@ -59,6 +71,10 @@ main = make comp
                          , value: maybe "" identity self.state.textVal
                          , onSubmitEditing: (capture_ $ send self AddItem )
                          }
+             , flatList { data: unsafeCoerce $ fromFoldable self.state.items
+                        , key: "itemsList"
+                        , renderItem: unsafeCoerce (\{item}-> text { children: [ string item.val ] })
+                        }
              , button { title: "save"
                       , key: "clickyButton"
                       , onPress: (capture_ $ send self AddItem )
@@ -81,8 +97,8 @@ debugLabelInfoView self =
                  ";" <> show self.state.textVal <>
                  ";" <> show self.state.items
     in
-     text {  key: "debugLabelInfo",
-             children: [string debugMsg]
+     text { key: "debugLabelInfo",
+            children: [string debugMsg]
           }
   else
     view {key: "debugLabelInfoEmpty", children: []}
