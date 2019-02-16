@@ -70,6 +70,7 @@ main = make comp
                          , onChange: (capture getText setStateText)
                          , value: maybe "" identity self.state.textVal
                          , onSubmitEditing: (capture_ $ send self AddItem )
+                         , autoCorrect: false
                          }
              , flatList { data: unsafeCoerce $ fromFoldable self.state.items
                         , key: "itemsList"
