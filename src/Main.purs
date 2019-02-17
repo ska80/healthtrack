@@ -1,7 +1,8 @@
 module Main where
-import Prelude (($), (+), (<>), show, identity)
+import Prelude (($), (+), (<>), show, identity, Unit, unit)
 -- import Effect.Console
--- import Effect
+import Effect (Effect(..))
+import Control.Applicative (pure)
 import Data.List (List(..), (:))
 import Data.Array (fromFoldable)
 import Data.Maybe (Maybe(..), maybe)
@@ -29,15 +30,21 @@ type State =
 
 type Item = {key :: String, val :: String }
 
-initialVal :: State
-initialVal = { nextId: 0,
-               textVal: Nothing,
-               items: Nil }
+initialState :: State
+initialState = { nextId: 0,
+                 textVal: Nothing,
+                 items: Nil }
 
 main :: JSX
 main = make comp
-  { render, initialState: initialVal } {}
+  { render,
+    initialState,
+    didMount
+    } {}
   where
+    didMount :: Self {} State -> Effect Unit
+    didMount self = pure unit
+
     update self =
       case _ of
         AddItem ->
@@ -53,7 +60,6 @@ main = make comp
 
     send = runUpdate update
 
-    initialList :: List Item
     initialList = (({key: "1", val: "ye"}) :  ({key: "2", val: "foo"}) : Nil)
 
     initialArray :: Array Item
