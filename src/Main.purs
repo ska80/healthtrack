@@ -1,9 +1,9 @@
 module Main where
 
-import Model (AppState, Item)
+import Model (AppState)
 import Prelude (($), (+), (<>), show, identity, Unit, unit, discard, bind, const)
 import Effect.Console (log)
-import Effect (Effect(..))
+import Effect (Effect)
 import Control.Applicative (pure)
 -- import Data.List (List(..), (:))
 import Data.Array (fromFoldable, (:))
@@ -14,17 +14,14 @@ import React.Basic (Self, StateUpdate(..), JSX, make, runUpdate, Component, crea
 import React.Basic.Events (EventFn, SyntheticEvent, unsafeEventFn)
 import React.Basic.DOM (css)
 import React.Basic.DOM.Events (capture_, capture)
-import React.Basic.Native (text_, text, string, button, view, textInput, flatList)
+import React.Basic.Native (text, string, button, view, textInput, flatList)
 import Storage as Storage
 import Unsafe.Coerce (unsafeCoerce)
 
 import Effect.Aff
-import Effect.Class
-import Effect.Aff.Compat
-import Data.Either
-
-
-
+import Effect.Class (liftEffect)
+-- import Effect.Aff.Compat
+import Data.Either (Either(..))
 
 comp :: Component {}
 comp = createComponent "Main"
@@ -52,18 +49,21 @@ main = make comp
       _ <- launchAff do
         liftEffect (log "loading AppState")
         loaded <- Storage.retrieve
-        let appState =
+        let
+          appState :: Aff AppState
+          appState =
               case loaded of
                 Left errors -> do
-                  liftEffect $ log "Errors loading:"
+                  liftEffect (log "Errors loading:" :: Effect Unit)
                   liftEffect $ log $ show errors
                   liftEffect $ log "end Errors loading:"
                   pure initialState
                 Right (state :: AppState) -> do
                   liftEffect $ log "loaded AppState"
                   pure state
-        self.setState(\b -> appState)
-        log "Launched!"
+        appState' <- appState
+        liftEffect $ self.setState(const appState')
+        liftEffect $ (log "Launched!" :: Effect Unit)
       pure unit
 
     didUpdate self = do
