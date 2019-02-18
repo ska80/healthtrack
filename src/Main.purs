@@ -1,10 +1,12 @@
 module Main where
-import Prelude (($), (+), (<>), show, identity, Unit, unit)
--- import Effect.Console
+
+import Model (AppState, Item)
+import Prelude (($), (+), (<>), show, identity, Unit, unit, discard, bind, const)
+import Effect.Console (log)
 import Effect (Effect(..))
 import Control.Applicative (pure)
-import Data.List (List(..), (:))
-import Data.Array (fromFoldable)
+-- import Data.List (List(..), (:))
+import Data.Array (fromFoldable, (:))
 import Data.Maybe (Maybe(..), maybe)
 -- import Data.Tuple (Tuple(..))
 import Data.Nullable (toMaybe)
@@ -13,8 +15,16 @@ import React.Basic.Events (EventFn, SyntheticEvent, unsafeEventFn)
 import React.Basic.DOM (css)
 import React.Basic.DOM.Events (capture_, capture)
 import React.Basic.Native (text_, text, string, button, view, textInput, flatList)
-
+import Storage as Storage
 import Unsafe.Coerce (unsafeCoerce)
+
+import Effect.Aff
+import Effect.Class
+import Effect.Aff.Compat
+import Data.Either
+
+
+
 
 comp :: Component {}
 comp = createComponent "Main"
@@ -22,28 +32,43 @@ comp = createComponent "Main"
 data Action
   = AddItem
 
-type State =
-  { nextId :: Int
-  , textVal :: Maybe String
-  , items :: List Item
-  }
 
-type Item = {key :: String, val :: String }
-
-initialState :: State
+initialState :: AppState
 initialState = { nextId: 0,
                  textVal: Nothing,
-                 items: Nil }
+                 items: [] }
 
 main :: JSX
 main = make comp
   { render,
     initialState,
     didMount
+  -- , didUpdate
     } {}
   where
-    didMount :: Self {} State -> Effect Unit
-    didMount self = pure unit
+    didMount :: Self {} AppState -> Effect Unit
+    didMount self = do
+      log "Main has initialized"
+      _ <- launchAff do
+        liftEffect (log "loading AppState")
+        loaded <- Storage.retrieve
+        let appState =
+              case loaded of
+                Left errors -> do
+                  liftEffect $ log "Errors loading:"
+                  liftEffect $ log $ show errors
+                  liftEffect $ log "end Errors loading:"
+                  pure initialState
+                Right (state :: AppState) -> do
+                  liftEffect $ log "loaded AppState"
+                  pure state
+        self.setState(\b -> appState)
+        log "Launched!"
+      pure unit
+
+    didUpdate self = do
+      launchAff $ Storage.store self.state
+
 
     update self =
       case _ of
@@ -59,12 +84,6 @@ main = make comp
              }
 
     send = runUpdate update
-
-    initialList = (({key: "1", val: "ye"}) :  ({key: "2", val: "foo"}) : Nil)
-
-    initialArray :: Array Item
-    initialArray = fromFoldable initialList
-    -- initialArray = [{key: 1, val: "ye"}, {key: 2, val: "foo"}]
 
     render self =
       view { style: css {flexDirection: "column", padding: 100}
@@ -96,7 +115,7 @@ showDebugInfo :: Boolean
 -- showDebugInfo = false
 showDebugInfo = true
 
-debugLabelInfoView :: Self {} State -> JSX
+debugLabelInfoView :: Self {} AppState -> JSX
 debugLabelInfoView self =
   if showDebugInfo then
     let

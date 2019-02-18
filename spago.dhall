@@ -11,6 +11,8 @@ You can edit this file as you like.
     , "react-basic"
     , "react-basic-native"
     , "typelevel-prelude"
+    , "debug"
+    , "simple-json"
     ]
 , packages =
     ./packages.dhall
