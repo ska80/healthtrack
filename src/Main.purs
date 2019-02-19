@@ -1,6 +1,7 @@
 module Main where
 
-import Model (AppState)
+import Model (AppState, Screens(..))
+
 import Prelude (($), (+), (<>), show, identity, Unit, unit, discard, bind, const)
 import Effect.Console (log)
 import Effect (Effect)
@@ -18,6 +19,7 @@ import React.Basic.Native (text, string, button, view, textInput, flatList)
 import Storage as Storage
 import Unsafe.Coerce (unsafeCoerce)
 
+
 import Effect.Aff
 import Effect.Class (liftEffect)
 
@@ -29,11 +31,12 @@ comp = createComponent "Main"
 data Action
   = AddItem
 
-
 initialState :: AppState
-initialState = { nextId: 0,
-                 textVal: Nothing,
-                 items: [] }
+initialState = { nextId: 0
+               , textVal: Nothing
+               , items: []
+               , currentScreen: MenuScreen
+               }
 
 main :: JSX
 main = make comp
