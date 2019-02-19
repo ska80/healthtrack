@@ -20,7 +20,7 @@ import Unsafe.Coerce (unsafeCoerce)
 
 import Effect.Aff
 import Effect.Class (liftEffect)
--- import Effect.Aff.Compat
+
 import Data.Either (Either(..))
 
 comp :: Component {}
@@ -37,11 +37,11 @@ initialState = { nextId: 0,
 
 main :: JSX
 main = make comp
-  { render,
-    initialState,
-    didMount
-  -- , didUpdate
-    } {}
+  { render
+  , initialState
+  , didMount
+  , didUpdate
+  } {}
   where
     didMount :: Self {} AppState -> Effect Unit
     didMount self = do
@@ -60,14 +60,19 @@ main = make comp
                   pure initialState
                 Right (state :: AppState) -> do
                   liftEffect $ log "loaded AppState"
+                  liftEffect $ log $ show state
                   pure state
         appState' <- appState
         liftEffect $ self.setState(const appState')
         liftEffect $ (log "Launched!" :: Effect Unit)
       pure unit
 
-    didUpdate self = do
-      launchAff $ Storage.store self.state
+    didUpdate self prev = do
+      _ <- launchAff do
+        liftEffect $ log "Storing state"
+        Storage.store self.state
+        liftEffect $ log "done Storing state"
+      pure unit
 
 
     update self =
