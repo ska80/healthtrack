@@ -27,6 +27,14 @@ type Item = {key :: String, val :: String }
 data Screens
   = MenuScreen
   | AddItemScreen
+  | DeveloperScreen
+
+initialState :: AppState
+initialState = { nextId: 0
+               , textVal: Nothing
+               , items: []
+               , currentScreen: MenuScreen
+               }
 
 -- based off of
 -- https://github.com/justinwoo/purescript-simple-json/blob/master/test/EnumSumGeneric.purs
