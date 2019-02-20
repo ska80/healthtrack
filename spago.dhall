@@ -13,6 +13,7 @@ You can edit this file as you like.
     , "typelevel-prelude"
     , "debug"
     , "simple-json"
+    , "generics-rep"
     ]
 , packages =
     ./packages.dhall

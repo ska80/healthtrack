@@ -1,10 +1,9 @@
 module Storage where
 
-import Prelude
-import Effect.Aff
-import Effect.Uncurried
-import Effect.Aff.Compat
-import Data.Either
+import Prelude (Unit, bind, discard, pure, unit, ($))
+import Effect.Aff (Aff)
+import Effect.Aff.Compat (EffectFnAff, fromEffectFnAff)
+import Data.Either (Either)
 import Foreign (MultipleErrors)
 import Model
 import Simple.JSON as JSON
