@@ -1,14 +1,12 @@
 module MenuScreen where
 
-import React.Basic (JSX, Component, makeStateless, createComponent)
-
-import Model (Screens(..))
 import Effect (Effect)
+import Model (Screens(..))
 import Prelude (Unit)
-
-import React.Basic.Native (button, view)
-import React.Basic.DOM.Events (capture_)
+import React.Basic (JSX, Component, makeStateless, createComponent)
 import React.Basic.DOM (css)
+import React.Basic.DOM.Events (capture_)
+import React.Basic.Native (button, view)
 
 type Props
   = { onMenuClick :: Screens -> Effect Unit
@@ -21,7 +19,7 @@ menu :: Props -> JSX
 menu props' = makeStateless comp render props'
   where
     render props =
-      view { key: "debugLabelInfoEmpty"
+      view { key: "menu"
            , style: css { flexDirection: "column", padding: 100 }
            , children: buttonElements
            }

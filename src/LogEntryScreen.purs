@@ -1,29 +1,18 @@
 module LogEntryScreen where
 
-import Model (AppState, Screens(..))
-
-import Prelude (($), (+), (<>), show, identity, Unit, unit, discard, bind, const)
-import Effect.Console (log)
-import Effect (Effect)
-import Control.Applicative (pure)
--- import Data.List (List(..), (:))
 import Data.Array (fromFoldable, (:))
 import Data.Maybe (Maybe(..), maybe)
--- import Data.Tuple (Tuple(..))
 import Data.Nullable (toMaybe)
-import React.Basic (Self, StateUpdate(..), JSX, make, runUpdate, Component, createComponent)
-import React.Basic.Events (EventFn, SyntheticEvent, unsafeEventFn)
+import Effect (Effect)
+import Effect.Console (log)
+import Model (AppState, Screens(..))
+import Prelude (Unit, discard, identity, show, ($), (+))
+import React.Basic (StateUpdate(..), JSX, make, runUpdate, Component, createComponent)
 import React.Basic.DOM (css)
 import React.Basic.DOM.Events (capture_, capture)
+import React.Basic.Events (EventFn, SyntheticEvent, unsafeEventFn)
 import React.Basic.Native (text, string, button, view, textInput, flatList)
-import Storage as Storage
 import Unsafe.Coerce (unsafeCoerce)
-
-
-import Effect.Aff
-import Effect.Class (liftEffect)
-
-import Data.Either (Either(..))
 
 comp :: Component Props
 comp = createComponent "Main"

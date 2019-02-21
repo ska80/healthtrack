@@ -1,19 +1,15 @@
 module Model where
 
-import Prelude
-
 import Control.Alt ((<|>))
 import Control.Monad.Except (throwError)
-
 import Data.Generic.Rep (class Generic, Constructor(..), NoArguments(..), Sum(..), to)
 import Data.Generic.Rep.Show (genericShow)
-
+import Data.Maybe (Maybe(..))
 import Foreign (Foreign, unsafeToForeign)
 import Foreign as Foreign
+import Prelude
 import Simple.JSON as JSON
 import Type.Prelude (class IsSymbol, SProxy(..), reflectSymbol)
-
-import Data.Maybe (Maybe(..))
 
 type AppState =
   { nextId :: Int

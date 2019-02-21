@@ -1,11 +1,11 @@
 module Storage where
 
-import Prelude (Unit, bind, discard, pure, unit, ($))
+import Data.Either (Either)
 import Effect.Aff (Aff)
 import Effect.Aff.Compat (EffectFnAff, fromEffectFnAff)
-import Data.Either (Either)
 import Foreign (MultipleErrors)
 import Model
+import Prelude (Unit, bind, discard, pure, unit, ($))
 import Simple.JSON as JSON
 
 foreign import storeData_ :: String -> String -> EffectFnAff Unit

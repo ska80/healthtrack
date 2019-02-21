@@ -1,32 +1,18 @@
 module Main where
 
-import Model (AppState, Screens(..), initialState)
-
-import Prelude (($), (+), (<>), show, identity, Unit, unit, discard, bind, const)
-import Effect.Console (log)
-import Effect (Effect)
 import Control.Applicative (pure)
--- import Data.List (List(..), (:))
-import Data.Array (fromFoldable, (:))
-import Data.Maybe (Maybe(..), maybe)
--- import Data.Tuple (Tuple(..))
-import Data.Nullable (toMaybe)
-import React.Basic (Self, StateUpdate(..), JSX, make, runUpdate, Component, createComponent)
-import React.Basic.Events (EventFn, SyntheticEvent, unsafeEventFn)
-import React.Basic.DOM (css)
-import React.Basic.DOM.Events (capture_, capture)
-import React.Basic.Native (text, string, button, view, textInput, flatList)
-import Storage as Storage
-import Unsafe.Coerce (unsafeCoerce)
-
-import MenuScreen as MenuScreen
-import LogEntryScreen as LogEntryScreen
-
-
+import Data.Either (Either(..))
+import DeveloperScreen as DeveloperScreen
+import Effect (Effect)
 import Effect.Aff
 import Effect.Class (liftEffect)
-
-import Data.Either (Either(..))
+import Effect.Console (log)
+import LogEntryScreen as LogEntryScreen
+import MenuScreen as MenuScreen
+import Model (AppState, Screens(..), initialState)
+import Prelude (($), (<>), show, Unit, unit, discard, bind, const)
+import React.Basic (Self, StateUpdate(..), JSX, make, runUpdate, Component, createComponent)
+import Storage as Storage
 
 comp :: Component {}
 comp = createComponent "Main"
@@ -85,11 +71,14 @@ main = make comp
             (\self' -> log ("ChangingScreen " <> show screen))
 
     send = runUpdate update
+
+    changeScreen self screen =
+      send self (ChangeScreen screen)
+
     render self =
       case self.state.currentScreen of
         MenuScreen ->
-          MenuScreen.menu { onMenuClick: \screen ->
-                            send self (ChangeScreen AddItemScreen)}
+          MenuScreen.menu { onMenuClick: changeScreen self }
         AddItemScreen ->
           LogEntryScreen.logEntryScreen { state: self.state
                                         , onStateUpdate:
@@ -97,4 +86,8 @@ main = make comp
                                              self.setState (\s-> newState)
                                         }
 
-        DeveloperScreen -> view {}
+        DeveloperScreen ->
+          DeveloperScreen.developerScreen
+            { returnToMenuE: changeScreen self MenuScreen
+            , appState: self.state
+            }
