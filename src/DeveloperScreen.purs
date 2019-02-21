@@ -5,7 +5,7 @@ import Model (AppState)
 import Prelude (Unit, ($))
 import React.Basic (JSX, Component, makeStateless, createComponent)
 import React.Basic.DOM.Events (capture_)
-import React.Basic.Native (button, view, text_, string)
+import React.Basic.Native (button, view, text, string)
 import Util as Util
 
 type Props =
@@ -27,5 +27,8 @@ developerScreen props' = makeStateless comp render props'
                    , key: "MenuButton"
                    , onPress: capture_ props.returnToMenuE
                    }
-          , text_ [ string $ Util.objToJSONString props.appState ]
+
+          , text { children: [ string $ Util.objToJSONString props.appState ]
+                 , key: "debugOutputTextArea"
+                 }
           ]
