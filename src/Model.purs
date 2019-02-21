@@ -15,15 +15,16 @@ type AppState =
   { nextId :: Int
   , textVal :: Maybe String
   , items :: Array Item
-  , currentScreen :: Screens
+  , currentScreen :: Screen
   }
 
 type Item = {key :: String, val :: String }
 
-data Screens
+data Screen
   = MenuScreen
   | AddItemScreen
   | DeveloperScreen
+  | ViewLogScreen
 
 initialState :: AppState
 initialState = { nextId: 0
@@ -67,14 +68,14 @@ instance constructorEnumReadForeign ::
     where
       name = reflectSymbol (SProxy :: SProxy name)
 
-derive instance genericScreens :: Generic Screens _
+derive instance genericScreen :: Generic Screen _
 
 
-instance screensReadForeign :: JSON.ReadForeign Screens where
+instance screensReadForeign :: JSON.ReadForeign Screen where
   readImpl = enumReadForeign
 
-instance screensWriteForeign :: JSON.WriteForeign Screens where
+instance screensWriteForeign :: JSON.WriteForeign Screen where
   writeImpl = unsafeToForeign <<< show
 
-instance screensShow :: Show Screens where
+instance screensShow :: Show Screen where
   show = genericShow

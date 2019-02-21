@@ -9,16 +9,17 @@ import Effect.Class (liftEffect)
 import Effect.Console (log)
 import LogEntryScreen as LogEntryScreen
 import MenuScreen as MenuScreen
-import Model (AppState, Screens(..), initialState)
+import Model (AppState, Screen(..), initialState)
 import Prelude (($), (<>), show, Unit, unit, discard, bind, const)
 import React.Basic (Self, StateUpdate(..), JSX, make, runUpdate, Component, createComponent)
 import Storage as Storage
+import ViewLogScreen as ViewLogScreen
 
 comp :: Component {}
 comp = createComponent "Main"
 
 data Action
-  = ChangeScreen Screens
+  = ChangeScreen Screen
 
 main :: JSX
 main = make comp
@@ -84,7 +85,13 @@ main = make comp
                                         , onStateUpdate:
                                           \newState ->
                                              self.setState (\s-> newState)
+                                        , returnToMenuE: changeScreen self MenuScreen
                                         }
+        ViewLogScreen ->
+          ViewLogScreen.viewLogScreen
+            { returnToMenuE: changeScreen self MenuScreen
+            , state: self.state
+            }
 
         DeveloperScreen ->
           DeveloperScreen.developerScreen

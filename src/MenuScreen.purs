@@ -1,7 +1,7 @@
 module MenuScreen where
 
 import Effect (Effect)
-import Model (Screens(..))
+import Model (Screen(..))
 import Prelude (Unit)
 import React.Basic (JSX, Component, makeStateless, createComponent)
 import React.Basic.DOM (css)
@@ -9,7 +9,7 @@ import React.Basic.DOM.Events (capture_)
 import React.Basic.Native (button, view)
 
 type Props
-  = { onMenuClick :: Screens -> Effect Unit
+  = { onMenuClick :: Screen -> Effect Unit
     }
 
 comp :: Component Props
@@ -28,6 +28,10 @@ menu props' = makeStateless comp render props'
           [ button { title: "Add Item"
                    , key: "AddItemScreenButton"
                    , onPress: capture_ (props.onMenuClick AddItemScreen)
+                   }
+          , button { title: "View Log"
+                   , key: "ViewLogButton"
+                   , onPress: capture_ (props.onMenuClick ViewLogScreen)
                    }
           , button { title: "Developer"
                    , key: "DeveloperButton"
