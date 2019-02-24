@@ -1,0 +1,32 @@
+* todos
+** make view log screen
+*** back button
+*** Edit buttons on each entry
+*** sorting (date entered, date applicable)
+** Edit entry view
+*** simple entry view w/ little detail
+*** "just" like the create entry view?
+** create entry view
+*** store time entry was created
+*** store when this was applicable to
+*** types:
+**** symptoms
+**** food
+***** water
+***** have list of foods user may want to worry about?
+**** conditions (better name?)
+     (e.g. very stressed, at work today, had dr appointment etc)
+**** wakeup time
+*** "approximations"
+*** allow for ranges of time
+*** quantity approximations (size of fist, size of... etc)
+** History view
+   have list/history of all actions taken
+** Make/store list of user actions
+** configurable notifications
+*** "when did you wake up today?"
+*** "did you have any snacks?"
+*** "review your day and add anything you forgot" in night time
+** put data a database instead of
+** encrypt the whole appstate when saving (keystore)
+** disable the developer view
