@@ -17,7 +17,9 @@ type AppState =
   , items :: Array Item
   , currentScreen :: Screen
   }
+-- TODO convert state to be a made up of a list of changes (event source-y)
 
+-- TODO add more data here: esp date added, date modified
 type Item = {key :: String, val :: String }
 
 data Screen

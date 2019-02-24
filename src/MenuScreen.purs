@@ -25,11 +25,11 @@ menu props' = makeStateless comp render props'
            }
       where
         buttonElements =
-          [ button { title: "Add Item"
+          [ button { title: "Add Entry"
                    , key: "AddItemScreenButton"
                    , onPress: capture_ (props.onMenuClick AddItemScreen)
                    }
-          , button { title: "View Log"
+          , button { title: "View Entries"
                    , key: "ViewLogButton"
                    , onPress: capture_ (props.onMenuClick ViewLogScreen)
                    }

@@ -1,17 +1,17 @@
 module LogEntryScreen where
 
-import Data.Array (fromFoldable, (:))
+import Data.Array ((:))
 import Data.Maybe (Maybe(..), maybe)
 import Data.Nullable (toMaybe)
 import Effect (Effect)
 import Effect.Console (log)
-import Model (AppState)
+import Model (AppState, Screen(..))
 import Prelude (Unit, discard, identity, show, ($), (+))
 import React.Basic (StateUpdate(..), JSX, make, runUpdate, Component, createComponent)
 import React.Basic.DOM (css)
 import React.Basic.DOM.Events (capture_, capture)
 import React.Basic.Events (EventFn, SyntheticEvent, unsafeEventFn)
-import React.Basic.Native (text, string, button, view, textInput, flatList)
+import React.Basic.Native (text, string, button, view, textInput)
 import Unsafe.Coerce (unsafeCoerce)
 
 comp :: Component Props
@@ -24,6 +24,7 @@ type Props =
   { state :: AppState
   , onStateUpdate :: AppState -> Effect Unit
   , returnToMenuE :: Effect Unit
+  , changeScreen :: Screen -> Effect Unit
   }
 
 logEntryScreen :: Props -> JSX
@@ -33,7 +34,7 @@ logEntryScreen props = make comp
   } props
   where
     updateParent self = do
-      log "logEntryScreen updateParent"
+      -- log "logEntryScreen updateParent"
       self.props.onStateUpdate self.state
 
     update self =
@@ -62,12 +63,23 @@ logEntryScreen props = make comp
                       , key: "MenuButton"
                       , onPress: capture_ props.returnToMenuE
                       }
+             , button { title: "View Existing Entries"
+                      , key: "ViewLogButton"
+                      , onPress: capture_ (props.changeScreen ViewLogScreen)
+                      }
+               -- TODO better instructions?
+             , text { key: "instructions", children: [ string "Add a New Entry" ] }
+
+               -- TODO make text input multiline
+               -- TODO style so that its easier to tell where the text box is
              , textInput { key: "txtinput"
-                         , placeholder: "type here"
+                         , placeholder: "Enter entry text here"
                          , style: css { flex: 1 }
                          , onChange: (capture getText setStateText)
                          , value: maybe "" identity self.state.textVal
                          , onSubmitEditing: (capture_ $ send self AddItem )
+                           -- TODO maybe reenable autocorrect? seems like there should be a better way to handle
+                           -- the weird way the app was re-populating the field. idk.
                          , autoCorrect: false
                          }
              , button { title: "save"
@@ -80,6 +92,8 @@ logEntryScreen props = make comp
           setStateText tv =
             self.setState _ { textVal = tv }
 
+
+-- TODO should probably move this to util
 getText :: EventFn SyntheticEvent (Maybe String)
 getText = unsafeEventFn \e ->
   toMaybe (unsafeCoerce e).nativeEvent.text

@@ -21,8 +21,10 @@ comp = createComponent "ViewLogScreen"
 type Props =
   { returnToMenuE :: Effect Unit
   , state :: AppState
+  , changeScreen :: Screen -> Effect Unit
   }
 
+-- TODO finish add "new entry" button
 viewLogScreen :: Props -> JSX
 viewLogScreen props' = makeStateless comp render props'
   where
@@ -30,15 +32,22 @@ viewLogScreen props' = makeStateless comp render props'
     render props =
       view { style: css {flexDirection: "column", padding: 100}
            , children:
+             -- TODO add this "< Menu" button everywehre
+             -- TODO extact menu button into some kind of common views module
              [ button { title: "< Menu"
                       , key: "MenuButton"
                       , onPress: capture_ props.returnToMenuE
                       }
+
+             , button { title: "Add New Entry"
+                      , key: "AddItemScreenButton"
+                      , onPress: capture_ (props.changeScreen AddItemScreen)
+                      }
+
              , flatList { data: unsafeCoerce $ fromFoldable props.state.items
                         , key: "itemsList"
                         , renderItem: unsafeCoerce renderItem
                         }
-             , text { key: "testing", children: [ string "HEYA" ] }
              ]
            }
         where

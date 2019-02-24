@@ -86,11 +86,13 @@ main = make comp
                                           \newState ->
                                              self.setState (\s-> newState)
                                         , returnToMenuE: changeScreen self MenuScreen
+                                        , changeScreen: changeScreen self
                                         }
         ViewLogScreen ->
           ViewLogScreen.viewLogScreen
             { returnToMenuE: changeScreen self MenuScreen
             , state: self.state
+            , changeScreen: changeScreen self
             }
 
         DeveloperScreen ->
