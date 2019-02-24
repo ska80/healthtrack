@@ -70,10 +70,6 @@ logEntryScreen props = make comp
                          , onSubmitEditing: (capture_ $ send self AddItem )
                          , autoCorrect: false
                          }
-             -- , flatList { data: unsafeCoerce $ fromFoldable self.state.items
-             --            , key: "itemsList"
-             --            , renderItem: unsafeCoerce (\{item}-> text { children: [ string item.val ] })
-             --            }
              , button { title: "save"
                       , key: "clickyButton"
                       , onPress: (capture_ $ send self AddItem )
