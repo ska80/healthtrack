@@ -7,7 +7,7 @@ import Effect (Effect)
 import Effect.Aff
 import Effect.Class (liftEffect)
 import Effect.Console (log)
-import LogEntryScreen as LogEntryScreen
+import AddEntryScreen as AddEntryScreen
 import MenuScreen as MenuScreen
 import Model (AppState, Screen(..), initialState)
 import Prelude (($), (<>), show, Unit, unit, discard, bind, const)
@@ -81,7 +81,7 @@ main = make comp
         MenuScreen ->
           MenuScreen.menu { onMenuClick: changeScreen self }
         AddItemScreen ->
-          LogEntryScreen.logEntryScreen { state: self.state
+          AddEntryScreen.logEntryScreen { state: self.state
                                         , onStateUpdate:
                                           \newState ->
                                              self.setState (\s-> newState)

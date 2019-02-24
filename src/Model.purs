@@ -72,7 +72,6 @@ instance constructorEnumReadForeign ::
 
 derive instance genericScreen :: Generic Screen _
 
-
 instance screensReadForeign :: JSON.ReadForeign Screen where
   readImpl = enumReadForeign
 

@@ -1,12 +1,11 @@
-module LogEntryScreen where
+module AddEntryScreen where
 
 import Data.Array ((:))
 import Data.Maybe (Maybe(..), maybe)
 import Data.Nullable (toMaybe)
 import Effect (Effect)
-import Effect.Console (log)
 import Model (AppState, Screen(..))
-import Prelude (Unit, discard, identity, show, ($), (+))
+import Prelude (Unit, identity, show, ($), (+))
 import React.Basic (StateUpdate(..), JSX, make, runUpdate, Component, createComponent)
 import React.Basic.DOM (css)
 import React.Basic.DOM.Events (capture_, capture)
@@ -15,7 +14,7 @@ import React.Basic.Native (text, string, button, view, textInput)
 import Unsafe.Coerce (unsafeCoerce)
 
 comp :: Component Props
-comp = createComponent "LogEntryScreen"
+comp = createComponent "AddEntryScreen"
 
 data Action
   = AddItem
