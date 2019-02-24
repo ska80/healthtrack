@@ -69,17 +69,21 @@ logEntryScreen props = make comp
                -- TODO better instructions?
              , text { key: "instructions", children: [ string "Add a New Entry" ] }
 
-               -- TODO make text input multiline
-               -- TODO style so that its easier to tell where the text box is
+               -- TODO fix how box shifts width
              , textInput { key: "txtinput"
                          , placeholder: "Enter entry text here"
-                         , style: css { flex: 1 }
+                         , style: css { flex: 1
+                                      , borderWidth: 2
+                                      , borderColor: "black"
+                                      , padding: 5
+                                      }
                          , onChange: (capture getText setStateText)
                          , value: maybe "" identity self.state.textVal
                          , onSubmitEditing: (capture_ $ send self AddItem )
                            -- TODO maybe reenable autocorrect? seems like there should be a better way to handle
                            -- the weird way the app was re-populating the field. idk.
                          , autoCorrect: false
+                         , multiline: true
                          }
              , button { title: "save"
                       , key: "clickyButton"

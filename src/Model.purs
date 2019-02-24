@@ -11,6 +11,8 @@ import Prelude
 import Simple.JSON as JSON
 import Type.Prelude (class IsSymbol, SProxy(..), reflectSymbol)
 
+-- TODO REMEMBER TO HAVE A MIGRATION PLAN FOR USERS DATA WHEN UPDATES OCCUR!
+
 type AppState =
   { nextId :: Int
   , textVal :: Maybe String

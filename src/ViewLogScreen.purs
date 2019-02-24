@@ -36,12 +36,12 @@ viewLogScreen props' = makeStateless comp render props'
                       , key: "MenuButton"
                       , onPress: capture_ props.returnToMenuE
                       }
-
              , button { title: "Add New Entry"
                       , key: "AddItemScreenButton"
                       , onPress: capture_ (props.changeScreen AddItemScreen)
                       }
 
+               -- TODO add some separation between items in the list
              , flatList { data: unsafeCoerce $ fromFoldable props.state.items
                         , key: "itemsList"
                         , renderItem: unsafeCoerce renderItem
