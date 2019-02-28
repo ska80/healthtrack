@@ -34,7 +34,7 @@ main = make comp
       log "Main has initialized (didMount)"
       _ <- launchAff do
         liftEffect (log "loading AppState (didMount Aff)")
-        loaded <- Storage.retrieve
+        loaded <- Storage.retrieveAppState
         let
           appState :: Aff AppState
           appState =
@@ -60,7 +60,7 @@ main = make comp
     didUpdate self prev = do
       _ <- launchAff do
         liftEffect $ log "Storing state (didUpdate)"
-        Storage.store self.state
+        Storage.storeAppState self.state
         liftEffect $ log "done Storing state (didUpdate)"
       pure unit
 

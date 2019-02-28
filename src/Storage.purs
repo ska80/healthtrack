@@ -25,14 +25,14 @@ storeValue key value = do
 appStateKey :: String
 appStateKey = "AppState"
 
-store :: AppState -> Aff Unit
-store appState =
+storeAppState :: AppState -> Aff Unit
+storeAppState appState =
   let
     serialized = JSON.writeJSON appState
   in
    storeValue appStateKey serialized
 
-retrieve :: Aff (Either MultipleErrors AppState)
-retrieve = do
+retrieveAppState :: Aff (Either MultipleErrors AppState)
+retrieveAppState = do
   val <- retrieveValue appStateKey
   pure $ (JSON.readJSON val :: Either MultipleErrors AppState)

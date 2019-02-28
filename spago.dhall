@@ -14,6 +14,7 @@ You can edit this file as you like.
     , "debug"
     , "simple-json"
     , "generics-rep"
+    , "now"
     ]
 , packages =
     ./packages.dhall

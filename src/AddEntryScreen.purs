@@ -4,14 +4,15 @@ import Data.Array ((:))
 import Data.Maybe (Maybe(..), maybe)
 import Data.Nullable (toMaybe)
 import Effect (Effect)
-import Model (AppState, Screen(..))
-import Prelude (Unit, identity, show, ($), (+))
-import React.Basic (StateUpdate(..), JSX, make, runUpdate, Component, createComponent)
+import Model (AppState, Screen(..), CreatedAtInst(..))
+import Prelude (Unit, const, identity, show, ($), (+), bind)
+import React.Basic (StateUpdate(..), JSX, make, runUpdate, Component, createComponent, Self)
 import React.Basic.DOM (css)
 import React.Basic.DOM.Events (capture_, capture)
 import React.Basic.Events (EventFn, SyntheticEvent, unsafeEventFn)
 import React.Basic.Native (text, string, button, view, textInput)
 import Unsafe.Coerce (unsafeCoerce)
+import Effect.Now
 
 comp :: Component Props
 comp = createComponent "AddEntryScreen"
@@ -39,19 +40,23 @@ logEntryScreen props = make comp
     update self =
       case _ of
         AddItem ->
-          let
-            nextEntry =
-              { key: show self.state.nextId
-              , val: maybe "" identity self.state.textVal
-              }
-
-            nextState = self.state
-              { items =  nextEntry : self.state.items
-              , nextId = self.state.nextId + 1
-              , textVal = Nothing
-              }
-          in
-           UpdateAndSideEffects nextState updateParent
+          SideEffects doAddItem
+            where
+              doAddItem :: Self Props AppState -> Effect Unit
+              doAddItem self' = do
+                now' <- now
+                let
+                  nextEntry =
+                    { key: show self'.state.nextId
+                    , val: maybe "" identity self'.state.textVal
+                    , createdAt: CreatedAtInst now'
+                    }
+                  nextState = self'.state
+                    { items =  nextEntry : self'.state.items
+                    , nextId = self'.state.nextId + 1
+                    , textVal = Nothing
+                    }
+                self'.setState $ const nextState
 
     send = runUpdate update
 

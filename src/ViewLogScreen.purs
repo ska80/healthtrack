@@ -36,6 +36,7 @@ viewLogScreen props' = makeStateless comp render props'
                       , key: "MenuButton"
                       , onPress: capture_ props.returnToMenuE
                       }
+
              , button { title: "Add New Entry"
                       , key: "AddItemScreenButton"
                       , onPress: capture_ (props.changeScreen AddItemScreen)
