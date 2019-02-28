@@ -58,7 +58,7 @@ logEntryScreen props = make comp
                     }
                 self'.setState $ const nextState
                 updateParentState nextState
-
+                props.changeScreen ViewLogScreen
 
     send = runUpdate update
 
