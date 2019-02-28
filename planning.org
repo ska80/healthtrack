@@ -1,4 +1,7 @@
 * todos
+** design?
+i will def need to invest some time in design, i can't ignore it
+i think it will hurt any chances of success if I don't make a reasonable effort here.
 ** make view log screen
 *** back button
 *** Edit buttons on each entry
