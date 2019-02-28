@@ -5,7 +5,7 @@ import Data.Maybe (Maybe(..), maybe)
 import Data.Nullable (toMaybe)
 import Effect (Effect)
 import Model (AppState, Screen(..), CreatedAtInst(..))
-import Prelude (Unit, const, identity, show, ($), (+), bind)
+import Prelude (Unit, const, identity, show, ($), (+), bind, discard)
 import React.Basic (StateUpdate(..), JSX, make, runUpdate, Component, createComponent, Self)
 import React.Basic.DOM (css)
 import React.Basic.DOM.Events (capture_, capture)
@@ -33,9 +33,9 @@ logEntryScreen props = make comp
   , initialState: props.state
   } props
   where
-    updateParent self = do
+    updateParentState state = do
       -- log "logEntryScreen updateParent"
-      self.props.onStateUpdate self.state
+      props.onStateUpdate state
 
     update self =
       case _ of
@@ -57,6 +57,8 @@ logEntryScreen props = make comp
                     , textVal = Nothing
                     }
                 self'.setState $ const nextState
+                updateParentState nextState
+
 
     send = runUpdate update
 
