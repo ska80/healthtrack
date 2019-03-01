@@ -63,7 +63,7 @@ logEntryScreen props = make comp
     send = runUpdate update
 
     render self =
-      view { style: css {flexDirection: "column", padding: 100}
+      view { style: css {flexDirection: "column", padding: 50, width: "100%", height: "100%"}
            , children:
              [ button { title: "< Menu"
                       , key: "MenuButton"
@@ -80,9 +80,10 @@ logEntryScreen props = make comp
              , textInput { key: "txtinput"
                          , placeholder: "Enter entry text here"
                          , style: css { flex: 1
-                                      , borderWidth: 2
+                                      , borderWidth: 1
                                       , borderColor: "black"
                                       , padding: 5
+                                      , width: "100%"
                                       }
                          , onChange: (capture getText setStateText)
                          , value: maybe "" identity self.state.textVal
