@@ -51,7 +51,6 @@ derive instance genericCreatedAtInst :: Generic CreatedAtInst _
 instance createdAtInstShow :: Show CreatedAtInst where
   show = genericShow
 
-
 instance createdAtInstReadForeign :: JSON.ReadForeign CreatedAtInst where
   readImpl fnum = do
     parsed <- readNumber fnum
@@ -106,7 +105,6 @@ instance constructorEnumReadForeign ::
       name = reflectSymbol (SProxy :: SProxy name)
 
 derive instance genericScreen :: Generic Screen _
-
 
 instance screensReadForeign :: JSON.ReadForeign Screen where
   readImpl = enumReadForeign

@@ -1,11 +1,11 @@
 module ViewLogScreen where
 
+import Prelude
 import Data.Array (fromFoldable)
 import Data.Maybe (Maybe)
 import Data.Nullable (toMaybe)
 import Effect (Effect)
-import Model (AppState, Screen(..))
-import Prelude (Unit, ($))
+import Model (AppState, Screen(..), Item)
 import React.Basic (JSX, Component, makeStateless, createComponent)
 import React.Basic.DOM (css)
 import React.Basic.DOM.Events (capture_)
@@ -50,8 +50,11 @@ viewLogScreen props' = makeStateless comp render props'
              ]
            }
         where
+          renderItem :: { item :: Item } -> JSX
           renderItem {item} =
-            text { children: [ string item.val ] }
+            text { children: [ string $ item.val <> " : "
+                                 <> show item.createdAt
+                             ] }
 
 getText :: EventFn SyntheticEvent (Maybe String)
 getText = unsafeEventFn \e ->
