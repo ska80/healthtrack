@@ -30,8 +30,6 @@ viewLogScreen props' = makeStateless comp render props'
       view { style: css {flexDirection: "column", padding: 100}
            , children:
              [ CV.returnToMenuButton props
-             -- , CV.returnToMenuButton { returnToMenuE: props.returnToMenuE
-             --                         }
              , button { title: "Add New Entry"
                       , key: "AddItemScreenButton"
                       , onPress: capture_ (props.changeScreen AddItemScreen)
