@@ -1,16 +1,15 @@
 module ViewLogScreen where
 
 import Prelude
+
+import CommonViews as CV
 import Data.Array (fromFoldable)
-import Data.Maybe (Maybe)
-import Data.Nullable (toMaybe)
 import Effect (Effect)
 import Model (AppState, Screen(..), Item)
 import React.Basic (JSX, Component, makeStateless, createComponent)
 import React.Basic.DOM (css)
 import React.Basic.DOM.Events (capture_)
-import React.Basic.Events (EventFn, SyntheticEvent, unsafeEventFn)
-import React.Basic.Native (text, string, button, view, flatList)
+import React.Basic.Native (text, string, button, view, flatList, ListRenderItem, FlatListPropsItemSeparatorComponent)
 import Unsafe.Coerce (unsafeCoerce)
 
 comp :: Component Props
@@ -30,13 +29,9 @@ viewLogScreen props' = makeStateless comp render props'
     render props =
       view { style: css {flexDirection: "column", padding: 100}
            , children:
-             -- TODO add this "< Menu" button everywehre
-             -- TODO extact menu button into some kind of common views module
-             [ button { title: "< Menu"
-                      , key: "MenuButton"
-                      , onPress: capture_ props.returnToMenuE
-                      }
-
+             [ CV.returnToMenuButton props
+             -- , CV.returnToMenuButton { returnToMenuE: props.returnToMenuE
+             --                         }
              , button { title: "Add New Entry"
                       , key: "AddItemScreenButton"
                       , onPress: capture_ (props.changeScreen AddItemScreen)
@@ -45,17 +40,33 @@ viewLogScreen props' = makeStateless comp render props'
                -- TODO add some separation between items in the list
              , flatList { data: unsafeCoerce $ fromFoldable props.state.items
                         , key: "itemsList"
-                        , renderItem: unsafeCoerce renderItem
+                        , renderItem: toListRenderItem renderItem
+                        , "ItemSeparatorComponent": toFlatListPropsItemSeparatorComponent separator
                         }
              ]
            }
-        where
-          renderItem :: { item :: Item } -> JSX
-          renderItem {item} =
-            text { children: [ string $ item.val <> " : "
-                                 <> show item.createdAt
-                             ] }
 
-getText :: EventFn SyntheticEvent (Maybe String)
-getText = unsafeEventFn \e ->
-  toMaybe (unsafeCoerce e).nativeEvent.text
+toListRenderItem :: ({ item :: Item } -> JSX) -> ListRenderItem
+toListRenderItem = unsafeCoerce
+
+toFlatListPropsItemSeparatorComponent :: ({ highlighted :: Boolean } -> JSX) -> FlatListPropsItemSeparatorComponent
+toFlatListPropsItemSeparatorComponent = unsafeCoerce
+
+separator :: ({ highlighted :: Boolean } -> JSX)
+separator {highlighted} =
+  view { style: css { borderWidth: 1, backgroundColor: "black", margin: 10 } }
+
+renderItem :: { item :: Item } -> JSX
+renderItem {item} =
+  let
+    viewChildren =
+      [ text { key: "val"
+             , children: [ string item.val ] }
+      , text { key:"createdAt"
+             , children: [ string $ show item.createdAt ] }
+      ]
+  in
+   view { style: css { flex: 1, flexDirection: "column" }
+        , key: item.key
+        , children: viewChildren
+        }
