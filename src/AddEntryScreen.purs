@@ -14,6 +14,8 @@ import React.Basic.Native (text, string, button, view, textInput)
 import Unsafe.Coerce (unsafeCoerce)
 import Effect.Now
 
+import HealthTrack.Time (UTCInst(..))
+
 comp :: Component Props
 comp = createComponent "AddEntryScreen"
 
@@ -49,7 +51,7 @@ logEntryScreen props = make comp
                   nextEntry =
                     { key: show self'.state.nextId
                     , val: maybe "" identity self'.state.textVal
-                    , createdAt: CreatedAtInst now'
+                    , createdAt: CreatedAtInst $ UTCInst now'
                     }
                   nextState = self'.state
                     { items =  nextEntry : self'.state.items

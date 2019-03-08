@@ -123,6 +123,12 @@ let additions =
           , version = "master"
           , dependencies = [] : List Text
           }
+      , simple-moment =
+          { repo = "https://github.com/passy/purescript-simple-moment"
+          , version = "master"
+          , dependencies = [] : List Text
+          }
+
       }
 
 in  upstream ⫽ overrides ⫽ additions

@@ -1,16 +1,17 @@
 module Main where
 
-import Control.Applicative (pure)
+
+import Prelude
+
 import Data.Either (Either(..))
 import DeveloperScreen as DeveloperScreen
 import Effect (Effect)
-import Effect.Aff
+import Effect.Aff (Aff, launchAff)
 import Effect.Class (liftEffect)
 import Effect.Console (log)
 import AddEntryScreen as AddEntryScreen
 import MenuScreen as MenuScreen
 import Model (AppState, Screen(..), initialState)
-import Prelude (($), (<>), show, Unit, unit, discard, bind, const)
 import React.Basic (Self, StateUpdate(..), JSX, make, runUpdate, Component, createComponent)
 import Storage as Storage
 import ViewLogScreen as ViewLogScreen
@@ -34,7 +35,7 @@ main = make comp
       log "Main has initialized (didMount)"
       _ <- launchAff do
         liftEffect (log "loading AppState (didMount Aff)")
-        loaded <- Storage.retrieveAppState
+        loaded <- Storage.loadAndInitializeAppState
         let
           appState :: Aff AppState
           appState =
