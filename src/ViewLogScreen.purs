@@ -23,7 +23,6 @@ type Props =
   , changeScreen :: Screen -> Effect Unit
   }
 
--- TODO finish add "new entry" button
 viewLogScreen :: Props -> JSX
 viewLogScreen props' = makeStateless comp render props'
   where
@@ -36,8 +35,6 @@ viewLogScreen props' = makeStateless comp render props'
                       , key: "AddItemScreenButton"
                       , onPress: capture_ (props.changeScreen AddItemScreen)
                       }
-
-               -- TODO add some separation between items in the list
              , flatList { data: unsafeCoerce $ fromFoldable props.state.items
                         , key: "itemsList"
                         , renderItem: toListRenderItem $ renderItem props.state.userTZOffset
@@ -60,7 +57,6 @@ renderItem :: TZOffset -> { item :: Item } -> JSX
 renderItem offset {item} =
   let
     (CreatedAtInst utcInst) = item.createdAt
-    -- TODO make display date time only accept UTCInsts
     createdAtFormatted = TimeUtil.utcInstDisplayLocal offset utcInst
     viewChildren =
       [ text { key: "val"

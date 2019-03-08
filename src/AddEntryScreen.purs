@@ -1,18 +1,17 @@
 module AddEntryScreen where
 
+import Prelude
+
 import Data.Array ((:))
 import Data.Maybe (Maybe(..), maybe)
-import Data.Nullable (toMaybe)
 import Effect (Effect)
 import Model (AppState, Screen(..), CreatedAtInst(..))
-import Prelude (Unit, const, identity, show, ($), (+), bind, discard)
 import React.Basic (StateUpdate(..), JSX, make, runUpdate, Component, createComponent, Self)
 import React.Basic.DOM (css)
 import React.Basic.DOM.Events (capture_, capture)
-import React.Basic.Events (EventFn, SyntheticEvent, unsafeEventFn)
 import React.Basic.Native (text, string, button, view, textInput)
-import Unsafe.Coerce (unsafeCoerce)
-import Effect.Now
+import Effect.Now (now)
+import Util as Util
 
 import HealthTrack.Time (UTCInst(..))
 
@@ -77,8 +76,6 @@ logEntryScreen props = make comp
                       }
                -- TODO better instructions?
              , text { key: "instructions", children: [ string "Add a New Entry" ] }
-
-               -- TODO fix how box shifts width
              , textInput { key: "txtinput"
                          , placeholder: "Enter entry text here"
                          , style: css { flex: 1
@@ -87,7 +84,7 @@ logEntryScreen props = make comp
                                       , padding: 5
                                       , width: "100%"
                                       }
-                         , onChange: (capture getText setStateText)
+                         , onChange: (capture Util.getText setStateText)
                          , value: maybe "" identity self.state.textVal
                          , onSubmitEditing: (capture_ $ send self AddItem )
                            -- TODO maybe reenable autocorrect? seems like there should be a better way to handle
@@ -104,9 +101,3 @@ logEntryScreen props = make comp
         where
           setStateText tv =
             self.setState _ { textVal = tv }
-
-
--- TODO should probably move this to util
-getText :: EventFn SyntheticEvent (Maybe String)
-getText = unsafeEventFn \e ->
-  toMaybe (unsafeCoerce e).nativeEvent.text
