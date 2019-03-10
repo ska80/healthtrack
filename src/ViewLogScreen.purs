@@ -13,9 +13,13 @@ import React.Basic.Native (text, string, button, view, flatList, ListRenderItem,
 import Unsafe.Coerce (unsafeCoerce)
 import HealthTrack.Time (TZOffset)
 import HealthTrack.TimeUtil as TimeUtil
+import React.Basic (StateUpdate(..), JSX, make, runUpdate, Component, createComponent, Self)
 
 comp :: Component Props
 comp = createComponent "ViewLogScreen"
+
+data Action
+  = DeleteEntry
 
 type Props =
   { returnToMenuE :: Effect Unit
@@ -24,20 +28,30 @@ type Props =
   }
 
 viewLogScreen :: Props -> JSX
-viewLogScreen props' = makeStateless comp render props'
+viewLogScreen props = make comp
+   { render
+   , initialState: props.state
+   }
+   props
   where
-    render :: Props -> JSX
-    render props =
+    update self =
+      case _ of
+        DeleteEntry ->
+          NoUpdate
+
+    send = runUpdate update
+
+    render self =
       view { style: css {flexDirection: "column", padding: 100}
            , children:
-             [ CV.returnToMenuButton props
+             [ CV.returnToMenuButton self.props
              , button { title: "Add New Entry"
                       , key: "AddItemScreenButton"
-                      , onPress: capture_ (props.changeScreen AddItemScreen)
+                      , onPress: capture_ (self.props.changeScreen AddItemScreen)
                       }
-             , flatList { data: unsafeCoerce $ fromFoldable props.state.items
+             , flatList { data: unsafeCoerce $ fromFoldable self.state.items
                         , key: "itemsList"
-                        , renderItem: toListRenderItem $ renderItem props.state.userTZOffset
+                        , renderItem: toListRenderItem $ renderItem self send
                         , "ItemSeparatorComponent": toFlatListPropsItemSeparatorComponent separator
                         }
              ]
@@ -53,9 +67,13 @@ separator :: ({ highlighted :: Boolean } -> JSX)
 separator {highlighted} =
   view { style: css { borderWidth: 1, backgroundColor: "black", margin: 10 } }
 
-renderItem :: TZOffset -> { item :: Item } -> JSX
-renderItem offset {item} =
+
+-- TODO add an "edit" button in here somehow
+-- TODO add a delete button also
+renderItem :: Self Props AppState -> (Self Props AppState -> Action -> Effect Unit) -> { item :: Item } -> JSX
+renderItem self send {item} =
   let
+    offset = self.state.userTZOffset
     (CreatedAtInst utcInst) = item.createdAt
     createdAtFormatted = TimeUtil.utcInstDisplayLocal offset utcInst
     viewChildren =
@@ -63,6 +81,10 @@ renderItem offset {item} =
              , children: [ string item.val ] }
       , text { key:"createdAt"
              , children: [ string createdAtFormatted ] }
+      , button { title: "delete"
+               , key: "DeleteButton"
+               , onPress: (capture_ $ send self DeleteEntry )
+               }
       ]
   in
    view { style: css { flex: 1, flexDirection: "column" }

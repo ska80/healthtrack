@@ -30,6 +30,18 @@ type Item =
   , createdAt :: CreatedAtInst
   }
 
+data ItemEntry
+  = FoodItem
+    -- food, water, etc
+  | ConditionsItem
+    -- stress, sickness, etc
+  | SymptomItem
+    -- pain, etc
+  | ActivityItem
+    -- exercise, walking, etc
+  | TextItem
+    -- uncategorized, free form note
+
 newtype CreatedAtInst = CreatedAtInst UTCInst
 
 derive instance genericCreatedAtInst :: Generic CreatedAtInst _
