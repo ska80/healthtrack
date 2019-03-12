@@ -105,6 +105,19 @@ readItem itemF = do
     Just ca -> pure $ CreatedAtInst $ UTCInst ca
     Nothing -> fail $ ForeignError "could not parse createdAt time for item"
 
+  _type <- (FI.readProp "_type" >=> F.readString ) itemF
   key <- (FI.readProp "key" >=> F.readString ) itemF
-  val <- (FI.readProp "val" >=> F.readString ) itemF
+  itemData <- FI.readProp "data" itemF
+
+  let val' =
+        case _type of
+          "TextItem" -> readTextItem itemF
+          -- TODO this needs to be fixed for each other type
+          _ -> readTextItem itemF
+  val <- val'
   pure { createdAt, key, val }
+
+
+readTextItem :: F.Foreign -> F.F ItemEntry
+readTextItem itemEntryF = do
+  F.readString itemEntryF >>= (pure <<< TextItem)

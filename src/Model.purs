@@ -21,21 +21,27 @@ type AppState =
 
 type Item =
   { key :: String
-  , val :: String
+  , val :: ItemEntry
   , createdAt :: CreatedAtInst
   }
 
 data ItemEntry
   = FoodItem
     -- food, water, etc
-  | ConditionsItem
+  | ConditionItem
     -- stress, sickness, etc
   | SymptomItem
     -- pain, etc
   | ActivityItem
     -- exercise, walking, etc
-  | TextItem
+  | TextItem String
     -- uncategorized, free form note
+
+
+derive instance genericItemEntry :: Generic ItemEntry _
+
+instance itemEntryShow :: Show ItemEntry where
+  show = genericShow
 
 newtype CreatedAtInst = CreatedAtInst UTCInst
 

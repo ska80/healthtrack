@@ -75,8 +75,7 @@ renderItem self send {item} =
     (CreatedAtInst utcInst) = item.createdAt
     createdAtFormatted = TimeUtil.utcInstDisplayLocal offset utcInst
     viewChildren =
-      [ text { key: "val"
-             , children: [ string item.val ] }
+      [ dispEntryItem item.val
       , text { key:"createdAt"
              , children: [ string createdAtFormatted ] }
       , button { title: "delete"
@@ -89,3 +88,11 @@ renderItem self send {item} =
         , key: item.key
         , children: viewChildren
         }
+
+dispEntryItem :: ItemEntry -> JSX
+dispEntryItem val =
+  case val of
+    TextItem theVal ->
+      text { key: "val", children: [ string theVal ] }
+    _ ->
+      text { key: "val" , children: [ string "(could not decode)" ] }

@@ -49,7 +49,7 @@ logEntryScreen props = make comp
                 let
                   nextEntry =
                     { key: show self'.state.nextId
-                    , val: maybe "" identity self'.state.textVal
+                    , val: TextItem $ maybe "" identity self'.state.textVal
                     , createdAt: CreatedAtInst $ UTCInst now'
                     }
                   nextState = self'.state
