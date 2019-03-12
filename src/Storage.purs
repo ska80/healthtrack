@@ -2,29 +2,24 @@ module Storage where
 
 import Prelude
 
-import Control.Monad.Error.Class
-
 import Data.Either (Either)
 import Data.Maybe (Maybe(..))
 import Effect.Aff (Aff)
 import Effect.Class (liftEffect)
 import Effect.Aff.Compat (EffectFnAff, fromEffectFnAff)
 import Foreign (MultipleErrors, fail, ForeignError(..))
-import Model (AppState, initialState, Screen(..), Item, CreatedAtInst(..))
-import Data.DateTime.Instant (Instant(..), instant)
+import Model (AppState, Screen(..), Item, CreatedAtInst(..), ItemEntry(..))
+import Data.DateTime.Instant (instant)
 import Data.Time.Duration (Milliseconds(..))
-import Simple.JSON as JSON
 import Data.Traversable (traverse)
 import Global.Unsafe (unsafeStringify)
 import Foreign.JSON as FJ
 
-import Control.Monad.Except (runExcept, withExcept)
+import Control.Monad.Except (runExcept)
 import Foreign as F
 import Foreign.Index as FI
 import HealthTrack.Time (UTCInst(..))
 import HealthTrack.TimeUtil (getTZOffset)
-
-import Debug.Trace
 
 foreign import storeData_ :: String -> String -> EffectFnAff Unit
 
@@ -58,7 +53,7 @@ serializeAppState state =
           nextId: state.nextId
         }
   in
-   spy "serialized" $ unsafeStringify serialized
+   unsafeStringify serialized
 
 
 -- load and set up anything required to prepare the app state after

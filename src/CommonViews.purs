@@ -3,7 +3,7 @@ module CommonViews where
 import Prelude
 
 import Effect (Effect)
-import React.Basic (JSX, Component, makeStateless, createComponent)
+import React.Basic (JSX)
 import React.Basic.DOM.Events (capture_)
 import React.Basic.Native (button)
 

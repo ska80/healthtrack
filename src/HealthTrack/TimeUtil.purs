@@ -3,7 +3,7 @@ module HealthTrack.TimeUtil where
 import Prelude
 
 import Effect (Effect)
-import HealthTrack.Time (TZOffset(..), adjustUTCForTimeZone, LocalInst(..), UTCInst(..))
+import HealthTrack.Time (TZOffset(..), adjustUTCForTimeZone, LocalInst(..), UTCInst)
 import Data.JSDate  as JSD
 import Data.Time.Duration (Minutes(..))
 import Data.Formatter.DateTime as F

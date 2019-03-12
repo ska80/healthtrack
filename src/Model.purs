@@ -2,14 +2,9 @@ module Model where
 
 import Prelude
 
-import Control.Alt ((<|>))
-import Control.Monad.Except (throwError)
-import Data.Generic.Rep (class Generic, Constructor(..), NoArguments(..), Sum(..), to)
+import Data.Generic.Rep (class Generic)
 import Data.Generic.Rep.Show (genericShow)
 import Data.Maybe (Maybe(..))
-import Foreign (Foreign, unsafeToForeign, readNumber)
-import Foreign as Foreign
-import Simple.JSON as JSON
 import HealthTrack.Time (UTCInst, TZOffset(..))
 import Data.Time.Duration (Minutes(..))
 

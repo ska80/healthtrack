@@ -5,7 +5,7 @@ import Prelude
 import Data.Array ((:))
 import Data.Maybe (Maybe(..), maybe)
 import Effect (Effect)
-import Model (AppState, Screen(..), CreatedAtInst(..))
+import Model (AppState, Screen(..), CreatedAtInst(..), ItemEntry(..))
 import React.Basic (StateUpdate(..), JSX, make, runUpdate, Component, createComponent, Self)
 import React.Basic.DOM (css)
 import React.Basic.DOM.Events (capture_, capture)

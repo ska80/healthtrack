@@ -2,17 +2,12 @@ module HealthTrack.Time where
 
 import Prelude
 
-import Effect (Effect)
-
-import Data.Maybe (Maybe(..))
-import Data.DateTime.Instant (Instant, instant, unInstant)
-import Data.Time.Duration (Milliseconds(..))
-
-import Data.DateTime.Instant as Inst
+import Data.Maybe (Maybe)
+import Data.DateTime.Instant (Instant, fromDateTime, toDateTime)
 import Data.DateTime as DT
-import Data.Generic.Rep (class Generic, Constructor(..), NoArguments(..), Sum(..), to)
+import Data.Generic.Rep (class Generic)
 import Data.Generic.Rep.Show (genericShow)
-import Data.Time.Duration (Minutes(..), negateDuration)
+import Data.Time.Duration (Minutes, negateDuration)
 
 newtype TZOffset = TZOffset Minutes
 
@@ -36,7 +31,7 @@ adjustUTCForTimeZone (TZOffset mintues) (UTCInst instant) =
   -- unclear to me why offset needs to be negated and doens't come from
   -- browser as negative, but hey, what do I know?
   let
-    instAsDateTime = Inst.toDateTime instant
+    instAsDateTime = toDateTime instant
     adjusted = DT.adjust (negateDuration mintues) instAsDateTime
   in
-   (LocalInst <<< Inst.fromDateTime) <$> adjusted
+   (LocalInst <<< fromDateTime) <$> adjusted

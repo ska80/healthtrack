@@ -1,6 +1,5 @@
 module Main where
 
-
 import Prelude
 
 import Data.Either (Either(..))

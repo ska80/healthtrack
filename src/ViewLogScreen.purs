@@ -5,15 +5,13 @@ import Prelude
 import CommonViews as CV
 import Data.Array (fromFoldable)
 import Effect (Effect)
-import Model (AppState, Screen(..), Item, CreatedAtInst(..))
-import React.Basic (JSX, Component, makeStateless, createComponent)
+import HealthTrack.TimeUtil as TimeUtil
+import Model (AppState, Screen(..), Item, CreatedAtInst(..), ItemEntry(..))
+import React.Basic (JSX, Component, StateUpdate(..), make, runUpdate, createComponent, Self)
 import React.Basic.DOM (css)
 import React.Basic.DOM.Events (capture_)
 import React.Basic.Native (text, string, button, view, flatList, ListRenderItem, FlatListPropsItemSeparatorComponent)
 import Unsafe.Coerce (unsafeCoerce)
-import HealthTrack.Time (TZOffset)
-import HealthTrack.TimeUtil as TimeUtil
-import React.Basic (StateUpdate(..), JSX, make, runUpdate, Component, createComponent, Self)
 
 comp :: Component Props
 comp = createComponent "ViewLogScreen"
