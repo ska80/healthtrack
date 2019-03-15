@@ -26,17 +26,16 @@ type Item =
   }
 
 data ItemEntry
-  = FoodItem
+  = FoodItem String
     -- food, water, etc
-  | ConditionItem
+  | ConditionItem String
     -- stress, sickness, etc
-  | SymptomItem
+  | SymptomItem String
     -- pain, etc
-  | ActivityItem
+  | ActivityItem String
     -- exercise, walking, etc
   | TextItem String
     -- uncategorized, free form note
-
 
 derive instance genericItemEntry :: Generic ItemEntry _
 

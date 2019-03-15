@@ -13,6 +13,7 @@ import React.Basic.Native (text, string, button, view, textInput)
 import Effect.Now (now)
 import Util as Util
 
+
 import HealthTrack.Time (UTCInst(..))
 
 comp :: Component Props
@@ -20,6 +21,12 @@ comp = createComponent "AddEntryScreen"
 
 data Action
   = AddItem
+  | SelectEntryType AddEntryScreenType
+
+data AddEntryScreenType
+  = ChooseNewEntryType
+  | SymptomEntryType
+  | FoodEntryType
 
 type Props =
   { state :: AppState
@@ -28,43 +35,49 @@ type Props =
   , changeScreen :: Screen -> Effect Unit
   }
 
+type AddEntryScreenState =
+  { currentScreen :: AddEntryScreenType
+  , appState :: AppState
+  }
+
 logEntryScreen :: Props -> JSX
 logEntryScreen props = make comp
   { render
-  , initialState: props.state
+  , initialState: { appState: props.state, currentScreen: ChooseNewEntryType }
   } props
   where
-    updateParentState state = do
-      -- log "logEntryScreen updateParent"
-      props.onStateUpdate state
-
     update self =
       case _ of
+        SelectEntryType chosenScreen ->
+          Update $ self.state { currentScreen = chosenScreen }
+
         AddItem ->
           SideEffects doAddItem
             where
-              doAddItem :: Self Props AppState -> Effect Unit
+              doAddItem :: Self Props AddEntryScreenState -> Effect Unit
               doAddItem self' = do
                 now' <- now
                 let
                   nextEntry =
-                    { key: show self'.state.nextId
-                    , val: TextItem $ maybe "" identity self'.state.textVal
+                    { key: show self'.state.appState.nextId
+                    , val: TextItem $ maybe "" identity self'.state.appState.textVal
                     , createdAt: CreatedAtInst $ UTCInst now'
                     }
-                  nextState = self'.state
-                    { items =  nextEntry : self'.state.items
-                    , nextId = self'.state.nextId + 1
+                  nextState = self'.state.appState
+                    { items =  nextEntry : self'.state.appState.items
+                    , nextId = self'.state.appState.nextId + 1
                     , textVal = Nothing
                     }
-                self'.setState $ const nextState
-                updateParentState nextState
+                self'.setState $ _ { appState = nextState }
+                props.onStateUpdate nextState
                 props.changeScreen ViewLogScreen
 
     send = runUpdate update
 
     render self =
-      view { style: css {flexDirection: "column", padding: 50, width: "100%", height: "100%"}
+      view { style: css { flexDirection: "column", padding: 50
+                        , width: "100%", height: "100%"
+                        }
            , children:
              [ button { title: "< Menu"
                       , key: "MenuButton"
@@ -74,8 +87,17 @@ logEntryScreen props = make comp
                       , key: "ViewLogButton"
                       , onPress: capture_ (props.changeScreen ViewLogScreen)
                       }
-               -- TODO better instructions?
-             , text { key: "instructions", children: [ string "Add a New Entry" ] }
+             , text { key: "instructions"
+                    , children: [ string "Choose entry type:" ]
+                    }
+             , button { title: "Symptom"
+                      , key: "SymptomButton"
+                      , onPress: capture_ (send self $ SelectEntryType SymptomEntryType)
+                      }
+             , button { title: "Food"
+                      , key: "FoodButton"
+                      , onPress: capture_ (send self $ SelectEntryType FoodEntryType)
+                      }
              , textInput { key: "txtinput"
                          , placeholder: "Enter entry text here"
                          , style: css { flex: 1
@@ -85,10 +107,11 @@ logEntryScreen props = make comp
                                       , width: "100%"
                                       }
                          , onChange: (capture Util.getText setStateText)
-                         , value: maybe "" identity self.state.textVal
+                         , value: maybe "" identity self.state.appState.textVal
                          , onSubmitEditing: (capture_ $ send self AddItem )
-                           -- TODO maybe reenable autocorrect? seems like there should be a better way to handle
-                           -- the weird way the app was re-populating the field. idk.
+                           -- TODO maybe reenable autocorrect? seems like there
+                           -- should be a better way to fix the weird way the
+                           -- app was re-populating the field. idk.
                          , autoCorrect: false
                          , multiline: true
                          }
@@ -100,4 +123,4 @@ logEntryScreen props = make comp
            }
         where
           setStateText tv =
-            self.setState _ { textVal = tv }
+            self.setState \s-> s { appState = s.appState { textVal = tv } }
