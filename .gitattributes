@@ -1,1 +1,3 @@
 *.pbxproj -text
+
+*.purs gitlab-language=haskell
