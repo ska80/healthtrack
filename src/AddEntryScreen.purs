@@ -5,16 +5,16 @@ import Prelude
 import Data.Array ((:))
 import Data.Maybe (Maybe(..), maybe)
 import Effect (Effect)
-import Model (AppState, Screen(..), CreatedAtInst(..), ItemEntry(..))
+import Model (AppState, ItemEntry(..), Screen(..), CreatedAtInst(..))
 import React.Basic (StateUpdate(..), JSX, make, runUpdate, Component, createComponent, Self)
 import React.Basic.DOM (css)
-import React.Basic.DOM.Events (capture_, capture)
-import React.Basic.Native (text, string, button, view, textInput)
+import React.Basic.DOM.Events (capture_)
+import React.Basic.Native (text, string, button, view)
 import Effect.Now (now)
-import Util as Util
-
 
 import HealthTrack.Time (UTCInst(..))
+
+import HealthTrack.ItemEntryScreen.Text as IEText
 
 comp :: Component Props
 comp = createComponent "AddEntryScreen"
@@ -25,6 +25,7 @@ data Action
 
 data AddEntryScreenType
   = ChooseNewEntryType
+  | NoteEntryType
   | SymptomEntryType
   | FoodEntryType
 
@@ -46,81 +47,82 @@ logEntryScreen props = make comp
   , initialState: { appState: props.state, currentScreen: ChooseNewEntryType }
   } props
   where
+    update :: Self Props AddEntryScreenState -> Action
+              -> StateUpdate Props AddEntryScreenState
     update self =
       case _ of
         SelectEntryType chosenScreen ->
           Update $ self.state { currentScreen = chosenScreen }
 
         AddItem ->
-          SideEffects doAddItem
-            where
-              doAddItem :: Self Props AddEntryScreenState -> Effect Unit
-              doAddItem self' = do
-                now' <- now
-                let
-                  nextEntry =
-                    { key: show self'.state.appState.nextId
-                    , val: TextItem $ maybe "" identity self'.state.appState.textVal
-                    , createdAt: CreatedAtInst $ UTCInst now'
-                    }
-                  nextState = self'.state.appState
-                    { items =  nextEntry : self'.state.appState.items
-                    , nextId = self'.state.appState.nextId + 1
-                    , textVal = Nothing
-                    }
-                self'.setState $ _ { appState = nextState }
-                props.onStateUpdate nextState
-                props.changeScreen ViewLogScreen
+          SideEffects (const $ pure unit)
 
     send = runUpdate update
 
+    onEntryComplete :: Self Props AddEntryScreenState -> ItemEntry -> Effect Unit
+    onEntryComplete self' itemEntry = do
+      now' <- now
+      let
+        nextEntry =
+          { key: show self'.state.appState.nextId
+          , entry: itemEntry
+          , createdAt: CreatedAtInst $ UTCInst now'
+          }
+        nextState = self'.state.appState
+          { items =  nextEntry : self'.state.appState.items
+          , nextId = self'.state.appState.nextId + 1
+          }
+      self'.setState $ _ { appState = nextState }
+      props.onStateUpdate nextState
+      props.changeScreen ViewLogScreen
+
     render self =
-      view { style: css { flexDirection: "column", padding: 50
-                        , width: "100%", height: "100%"
-                        }
-           , children:
-             [ button { title: "< Menu"
-                      , key: "MenuButton"
-                      , onPress: capture_ props.returnToMenuE
-                      }
-             , button { title: "View Existing Entries"
-                      , key: "ViewLogButton"
-                      , onPress: capture_ (props.changeScreen ViewLogScreen)
-                      }
-             , text { key: "instructions"
-                    , children: [ string "Choose entry type:" ]
-                    }
-             , button { title: "Symptom"
-                      , key: "SymptomButton"
-                      , onPress: capture_ (send self $ SelectEntryType SymptomEntryType)
-                      }
-             , button { title: "Food"
-                      , key: "FoodButton"
-                      , onPress: capture_ (send self $ SelectEntryType FoodEntryType)
-                      }
-             , textInput { key: "txtinput"
-                         , placeholder: "Enter entry text here"
-                         , style: css { flex: 1
-                                      , borderWidth: 1
-                                      , borderColor: "black"
-                                      , padding: 5
-                                      , width: "100%"
-                                      }
-                         , onChange: (capture Util.getText setStateText)
-                         , value: maybe "" identity self.state.appState.textVal
-                         , onSubmitEditing: (capture_ $ send self AddItem )
-                           -- TODO maybe reenable autocorrect? seems like there
-                           -- should be a better way to fix the weird way the
-                           -- app was re-populating the field. idk.
-                         , autoCorrect: false
-                         , multiline: true
-                         }
-             , button { title: "save"
-                      , key: "clickyButton"
-                      , onPress: (capture_ $ send self AddItem )
-                      }
-             ]
-           }
-        where
-          setStateText tv =
-            self.setState \s-> s { appState = s.appState { textVal = tv } }
+      case self.state.currentScreen of
+        ChooseNewEntryType -> renderChooseNewEntryType unit
+        NoteEntryType -> renderNoteEntryType unit
+        _ -> renderChooseNewEntryType unit
+
+      where
+        wrapperView  children =
+         view { style: css { flexDirection: "column", padding: 50
+                            , width: "100%", height: "100%"
+                            }
+               , key:  "WrapperView2"
+               , children:
+                 [ button { title: "< Menu"
+                          , key:  "MenuButton"
+                          , onPress: capture_ props.returnToMenuE
+                          }
+                 , button { title: "View Existing Entries"
+                          , key:  "ViewLogButton"
+                          , onPress: capture_ (props.changeScreen ViewLogScreen)
+                          }
+                 -- TODO I cant figure out how to *not* need this wrapper view
+                 --      If I don't add this i get the unique key warning
+                 --      it seems that the issue more specifically is that
+                   --    IEText.element thing is not getting the key i pass as an arg
+                   --    I don't know if I am doing this right though.
+                   --    maybe search the net, or ask the purescript room for advice
+                 , view { key: "wrapperView", children }
+                 ]
+               }
+
+        renderChooseNewEntryType _ignored =
+          wrapperView children
+          where
+            children =
+              [ text { key: "instructionssssss"
+                     , children: [ string "Choose entry type:" ]
+                     }
+              , button { title: "Note"
+                       , key: "NoteButton"
+                       , onPress: capture_ (send self $ SelectEntryType NoteEntryType)
+                       }
+              ]
+
+        renderNoteEntryType _ignored =
+          wrapperView  children
+          where
+            children =
+              [ IEText.logEntryScreen { key: "IETextElem"
+                                      , onEntryComplete: onEntryComplete self } ]

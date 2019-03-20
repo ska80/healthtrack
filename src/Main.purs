@@ -42,7 +42,7 @@ main = make comp
                 Left errors -> do
                   liftEffect (log "Errors loading:" :: Effect Unit)
                   liftEffect $ log $ show errors
-                  liftEffect $ log "end Errors loading:"
+                  liftEffect $ log "End Errors loading"
                   pure initialState
                 Right (state :: AppState) -> do
                   liftEffect $ log "loaded AppState"

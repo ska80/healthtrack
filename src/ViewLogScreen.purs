@@ -75,7 +75,7 @@ renderItem self send {item} =
     (CreatedAtInst utcInst) = item.createdAt
     createdAtFormatted = TimeUtil.utcInstDisplayLocal offset utcInst
     viewChildren =
-      [ dispEntryItem item.val
+      [ dispEntryItem item.entry
       , text { key:"createdAt"
              , children: [ string createdAtFormatted ] }
       , button { title: "delete"

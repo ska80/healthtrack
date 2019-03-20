@@ -10,7 +10,6 @@ import Data.Time.Duration (Minutes(..))
 
 type AppState =
   { nextId :: Int
-  , textVal :: Maybe String
   , items :: Array Item
   , currentScreen :: Screen
   , userTZOffset :: TZOffset
@@ -21,7 +20,7 @@ type AppState =
 
 type Item =
   { key :: String
-  , val :: ItemEntry
+  , entry :: ItemEntry
   , createdAt :: CreatedAtInst
   }
 
@@ -62,7 +61,6 @@ instance screensShow :: Show Screen where
 
 initialState :: AppState
 initialState = { nextId: 0
-               , textVal: Nothing
                , items: []
                , currentScreen : MenuScreen
                , userTZOffset : TZOffset (Minutes 0.0)

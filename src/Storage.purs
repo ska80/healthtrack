@@ -2,22 +2,23 @@ module Storage where
 
 import Prelude
 
+import Control.Alternative ((<|>))
 import Data.Either (Either)
 import Data.Maybe (Maybe(..))
 import Effect.Aff (Aff)
 import Effect.Class (liftEffect)
 import Effect.Aff.Compat (EffectFnAff, fromEffectFnAff)
-import Foreign (MultipleErrors, fail, ForeignError(..))
+import Foreign (Foreign, MultipleErrors, fail, ForeignError(..), unsafeToForeign)
 import Model (AppState, Screen(..), Item, CreatedAtInst(..), ItemEntry(..))
 import Data.DateTime.Instant (instant)
 import Data.Time.Duration (Milliseconds(..))
 import Data.Traversable (traverse)
 import Global.Unsafe (unsafeStringify)
 import Foreign.JSON as FJ
-
 import Control.Monad.Except (runExcept)
 import Foreign as F
 import Foreign.Index as FI
+import Foreign.NullOrUndefined (null)
 import HealthTrack.Time (UTCInst(..))
 import HealthTrack.TimeUtil (getTZOffset)
 
@@ -47,14 +48,47 @@ storeAppState appState =
 
 serializeAppState :: AppState -> String
 serializeAppState state =
-  let serialized =
-        {
-          items: state.items,
-          nextId: state.nextId
-        }
+  let
+    serialized =
+      { items: serializeItem <$> state.items
+      , nextId: state.nextId
+      }
   in
    unsafeStringify serialized
 
+type SerializedItem =
+  { createdAt :: CreatedAtInst -- will stringify ok
+  , key :: String
+  , entry :: { _type :: String
+             , text :: Foreign
+             }
+  }
+
+-- TODO this is very much garbage, i need to figure out how to do this better
+-- I remember there being a thing in simple json about how to handle sum types w/ data
+serializeItem :: Item -> SerializedItem
+serializeItem item =
+  let
+    serializeItemEntry ie =
+      case ie of
+        TextItem text ->
+          { _type: "TextItem"
+          , text: unsafeToForeign text
+          }
+        _ ->
+          -- TODO fixme
+          { _type: "?"
+          , text: null
+          }
+  in
+   { createdAt:  item.createdAt
+   , key: item.key
+   , entry: serializeItemEntry item.entry
+   }
+
+-- TODO def need to add some kind of tests for serialization/deserialization
+-- might also be a good case for some kind of quickcheck like thing
+-- generate states, serialize/deserialize, assert they are right
 
 -- load and set up anything required to prepare the app state after
 -- application start
@@ -66,8 +100,7 @@ loadAndInitializeAppState = do
     makeThing :: { items :: Array Item
                  , nextId :: Int } -> AppState
     makeThing parsed =
-      { textVal : Nothing
-      , nextId : parsed.nextId
+      { nextId : parsed.nextId
       , items: parsed.items
       , currentScreen : MenuScreen
       , userTZOffset : tzOffset
@@ -83,15 +116,13 @@ parseSavedState val =
 
     nextId <- (FI.readProp "nextId" >=> F.readInt ) parsed
 
-    itemsFA <- (FI.readProp "items" >=> F.readArray) parsed
+    itemsF <- (FI.readProp "items" >=> F.readArray) parsed
 
-    items <- readItems itemsFA
+    items <- readItems itemsF
 
     pure  { nextId : nextId
           , items: items
           }
-
--- initializeLocalTimezoneOffset :: Effect TZOffset
 
 readItems :: Array F.Foreign -> F.F (Array Item)
 readItems itemsF =
@@ -105,19 +136,21 @@ readItem itemF = do
     Just ca -> pure $ CreatedAtInst $ UTCInst ca
     Nothing -> fail $ ForeignError "could not parse createdAt time for item"
 
-  _type <- (FI.readProp "_type" >=> F.readString ) itemF
-  key <- (FI.readProp "key" >=> F.readString ) itemF
-  itemData <- FI.readProp "data" itemF
+  key <- (FI.readProp "key" >=> F.readString) itemF
 
-  let val' =
-        case _type of
-          "TextItem" -> readTextItem itemF
-          -- TODO this needs to be fixed for each other type
-          _ -> readTextItem itemF
-  val <- val'
-  pure { createdAt, key, val }
+  itemEntryF <- FI.readProp "entry" itemF
 
+  entry <- readItemEntry itemEntryF
+  pure { createdAt, key, entry }
+
+readItemEntry :: F.Foreign -> F.F ItemEntry
+readItemEntry itemEntryF = do
+  _type <- (FI.readProp "_type" >=> F.readString) itemEntryF
+  case _type of
+    "TextItem" -> readTextItem itemEntryF
+    _ -> readTextItem itemEntryF
 
 readTextItem :: F.Foreign -> F.F ItemEntry
 readTextItem itemEntryF = do
-  F.readString itemEntryF >>= (pure <<< TextItem)
+  txt <- (FI.readProp "text" >=> F.readString) itemEntryF
+  pure $ TextItem txt
