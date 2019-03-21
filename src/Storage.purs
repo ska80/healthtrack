@@ -2,7 +2,6 @@ module Storage where
 
 import Prelude
 
-import Control.Alternative ((<|>))
 import Data.Either (Either)
 import Data.Maybe (Maybe(..))
 import Effect.Aff (Aff)
