@@ -3,11 +3,14 @@ module HealthTrack.Time where
 import Prelude
 
 import Data.Maybe (Maybe)
-import Data.DateTime.Instant (Instant, fromDateTime, toDateTime)
+import Data.DateTime.Instant (Instant, fromDateTime, toDateTime, unInstant)
+import Data.Time.Component (Millisecond)
 import Data.DateTime as DT
 import Data.Generic.Rep (class Generic)
 import Data.Generic.Rep.Show (genericShow)
-import Data.Time.Duration (Minutes, negateDuration)
+import Data.Time.Duration (Minutes(..), negateDuration, Milliseconds(..))
+import Data.Enum (fromEnum)
+import Data.Debug as D
 
 newtype TZOffset = TZOffset Minutes
 
@@ -16,13 +19,28 @@ derive instance genericTZOffset :: Generic TZOffset _
 instance showTZOffset :: Show TZOffset where
   show = genericShow
 
+instance tzOffsetDebug :: D.Debug TZOffset where
+  debug (TZOffset (Minutes mins))=
+    let
+      minutesRep = D.constructor "Mintues" [D.number mins]
+    in
+     D.constructor "TZOffset" [minutesRep]
+
 newtype UTCInst = UTCInst Instant
 
 derive instance genericUTCInst :: Generic UTCInst _
 
-instance createdAtInstShow :: Show UTCInst where
+instance utcInstShow :: Show UTCInst where
   show = genericShow
 
+instance utcInstDebug :: D.Debug UTCInst where
+  debug (UTCInst instant)=
+    let
+      Milliseconds millis = unInstant instant
+      numMilRep = D.constructor "Milliseconds" [D.number millis]
+      instantRep = D.constructor "Instant" [numMilRep]
+    in
+     D.constructor "UTCInst" [instantRep]
 
 newtype LocalInst = LocalInst Instant
 

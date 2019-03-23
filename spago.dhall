@@ -20,6 +20,7 @@ You can edit this file as you like.
     , "formatters"
     , "js-date"
     , "simple-moment"
+    , "debugged"
     ]
 , packages =
     ./packages.dhall

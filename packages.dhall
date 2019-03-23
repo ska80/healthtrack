@@ -128,6 +128,11 @@ let additions =
           , version = "master"
           , dependencies = [] : List Text
           }
+      , debugged =
+          { repo = "https://github.com/hdgarrood/purescript-debugged"
+          , version = "master"
+          , dependencies = [] : List Text
+          }
 
       }
 
