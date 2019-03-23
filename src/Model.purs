@@ -4,7 +4,6 @@ import Prelude
 
 import Data.Generic.Rep (class Generic)
 import Data.Generic.Rep.Show (genericShow)
-import Data.Maybe (Maybe(..))
 import HealthTrack.Time (UTCInst, TZOffset(..))
 import Data.Time.Duration (Minutes(..))
 
@@ -33,7 +32,7 @@ data ItemEntry
     -- pain, etc
   | ActivityItem String
     -- exercise, walking, etc
-  | TextItem String
+  | NoteItem String
     -- uncategorized, free form note
 
 derive instance genericItemEntry :: Generic ItemEntry _

@@ -6,6 +6,7 @@ import Data.Either (Either)
 import Data.Maybe (Maybe(..))
 import Effect.Aff (Aff)
 import Effect.Class (liftEffect)
+import Effect.Console (log)
 import Effect.Aff.Compat (EffectFnAff, fromEffectFnAff)
 import Foreign (Foreign, MultipleErrors, fail, ForeignError(..), unsafeToForeign)
 import Model (AppState, Screen(..), Item, CreatedAtInst(..), ItemEntry(..))
@@ -28,11 +29,13 @@ foreign import retrieveData_ :: String -> EffectFnAff String
 retrieveValue :: String -> Aff String
 retrieveValue key = do
   val <- fromEffectFnAff $ retrieveData_ key
+  liftEffect $ log $ "retrieved: " <> val
   pure val
 
 storeValue :: String -> String -> Aff Unit
 storeValue key value = do
   fromEffectFnAff $ storeData_ key value
+  liftEffect $ log $ "stored: " <> value
   pure unit
 
 appStateKey :: String
@@ -59,7 +62,7 @@ type SerializedItem =
   { createdAt :: CreatedAtInst -- will stringify ok
   , key :: String
   , entry :: { _type :: String
-             , text :: Foreign
+             , desc :: Foreign
              }
   }
 
@@ -70,15 +73,20 @@ serializeItem item =
   let
     serializeItemEntry ie =
       case ie of
-        TextItem text ->
-          { _type: "TextItem"
-          , text: unsafeToForeign text
+        NoteItem text ->
+          { _type: "NoteItem"
+          , desc: unsafeToForeign text
+          }
+        SymptomItem text ->
+          { _type: "SymptomItem"
+          , desc: unsafeToForeign text
           }
         _ ->
           -- TODO fixme
           { _type: "?"
-          , text: null
+          , desc: null
           }
+
   in
    { createdAt:  item.createdAt
    , key: item.key
@@ -146,10 +154,16 @@ readItemEntry :: F.Foreign -> F.F ItemEntry
 readItemEntry itemEntryF = do
   _type <- (FI.readProp "_type" >=> F.readString) itemEntryF
   case _type of
-    "TextItem" -> readTextItem itemEntryF
-    _ -> readTextItem itemEntryF
+    "NoteItem" -> readNoteItem itemEntryF
+    "SymptomItem" -> readSymptomItem itemEntryF
+    _ -> readNoteItem itemEntryF
 
-readTextItem :: F.Foreign -> F.F ItemEntry
-readTextItem itemEntryF = do
-  txt <- (FI.readProp "text" >=> F.readString) itemEntryF
-  pure $ TextItem txt
+readNoteItem :: F.Foreign -> F.F ItemEntry
+readNoteItem itemEntryF = do
+  txt <- (FI.readProp "desc" >=> F.readString) itemEntryF
+  pure $ NoteItem txt
+
+readSymptomItem :: F.Foreign -> F.F ItemEntry
+readSymptomItem itemEntryF = do
+  txt <- (FI.readProp "desc" >=> F.readString) itemEntryF
+  pure $ SymptomItem txt

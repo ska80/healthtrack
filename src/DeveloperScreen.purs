@@ -1,12 +1,12 @@
 module DeveloperScreen where
 
+import Prelude
+
 import Effect (Effect)
 import Model (AppState)
-import Prelude (Unit, ($))
 import React.Basic (JSX, Component, makeStateless, createComponent)
 import React.Basic.DOM.Events (capture_)
 import React.Basic.Native (button, view, text, string)
-import Util as Util
 
 type Props =
   { returnToMenuE :: Effect Unit
@@ -28,7 +28,7 @@ developerScreen props' = makeStateless comp render props'
                    , onPress: capture_ props.returnToMenuE
                    }
 
-          , text { children: [ string $ Util.objToJSONString props.appState ]
+          , text { children: [ string $ show props.appState ]
                  , key: "debugOutputTextArea"
                  }
           ]

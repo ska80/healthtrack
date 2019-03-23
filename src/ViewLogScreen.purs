@@ -65,7 +65,6 @@ separator :: ({ highlighted :: Boolean } -> JSX)
 separator {highlighted} =
   view { style: css { borderWidth: 1, backgroundColor: "black", margin: 10 } }
 
-
 -- TODO add an "edit" button in here somehow
 -- TODO add a delete button also
 renderItem :: Self Props AppState -> (Self Props AppState -> Action -> Effect Unit) -> { item :: Item } -> JSX
@@ -92,7 +91,9 @@ renderItem self send {item} =
 dispEntryItem :: ItemEntry -> JSX
 dispEntryItem val =
   case val of
-    TextItem theVal ->
+    NoteItem theVal ->
+      text { key: "val", children: [ string theVal ] }
+    SymptomItem theVal ->
       text { key: "val", children: [ string theVal ] }
     _ ->
       text { key: "val" , children: [ string "(could not decode)" ] }

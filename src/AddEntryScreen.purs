@@ -3,18 +3,16 @@ module AddEntryScreen where
 import Prelude
 
 import Data.Array ((:))
-import Data.Maybe (Maybe(..), maybe)
 import Effect (Effect)
-import Model (AppState, ItemEntry(..), Screen(..), CreatedAtInst(..))
+import Effect.Now (now)
+import HealthTrack.ItemEntryScreen.Note as IENote
+import HealthTrack.ItemEntryScreen.Symptom as IESymptom
+import HealthTrack.Time (UTCInst(..))
+import Model (AppState, ItemEntry, Screen(..), CreatedAtInst(..))
 import React.Basic (StateUpdate(..), JSX, make, runUpdate, Component, createComponent, Self)
 import React.Basic.DOM (css)
 import React.Basic.DOM.Events (capture_)
 import React.Basic.Native (text, string, button, view)
-import Effect.Now (now)
-
-import HealthTrack.Time (UTCInst(..))
-
-import HealthTrack.ItemEntryScreen.Text as IEText
 
 comp :: Component Props
 comp = createComponent "AddEntryScreen"
@@ -80,6 +78,7 @@ logEntryScreen props = make comp
       case self.state.currentScreen of
         ChooseNewEntryType -> renderChooseNewEntryType unit
         NoteEntryType -> renderNoteEntryType unit
+        SymptomEntryType -> renderSymptomEntryType unit
         _ -> renderChooseNewEntryType unit
 
       where
@@ -118,11 +117,24 @@ logEntryScreen props = make comp
                        , key: "NoteButton"
                        , onPress: capture_ (send self $ SelectEntryType NoteEntryType)
                        }
+              , button { title: "Symptom"
+                       , key: "symptombutton"
+                       , onPress: capture_ (send self $ SelectEntryType SymptomEntryType)
+                       }
               ]
+
 
         renderNoteEntryType _ignored =
           wrapperView  children
           where
             children =
-              [ IEText.logEntryScreen { key: "IETextElem"
-                                      , onEntryComplete: onEntryComplete self } ]
+              [ IENote.form { key: "IENoteElem"
+                            , onEntryComplete: onEntryComplete self } ]
+
+
+        renderSymptomEntryType _ignored =
+          wrapperView  children
+          where
+            children =
+              [ IESymptom.form { key: "IESymptomElem"
+                               , onEntryComplete: onEntryComplete self } ]

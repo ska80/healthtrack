@@ -1,11 +1,10 @@
-module HealthTrack.ItemEntryScreen.Text where
+module HealthTrack.ItemEntryScreen.Note where
 
 import Prelude
 
-import Data.Array ((:))
 import Data.Maybe (Maybe(..), maybe)
 import Effect (Effect)
-import Model (Screen(..), CreatedAtInst(..), ItemEntry(..))
+import Model (ItemEntry(..))
 import React.Basic (StateUpdate(..), JSX, make, runUpdate, Component, createComponent, Self)
 import React.Basic.DOM (css)
 import React.Basic.DOM.Events (capture_, capture)
@@ -13,11 +12,8 @@ import React.Basic.Native (text, string, button, view, textInput)
 import Effect.Now (now)
 import Util as Util
 
-
-import HealthTrack.Time (UTCInst(..))
-
 comp :: Component Props
-comp = createComponent "AddTextEntryScreen"
+comp = createComponent "AddNoteEntryScreen"
 
 data Action
   = AddItem
@@ -27,28 +23,28 @@ type Props =
   , key :: String
   }
 
-type TextEntryScreenState =
+type NoteEntryScreenState =
   { textVal :: Maybe String
   }
 
-logEntryScreen :: Props -> JSX
-logEntryScreen props = make comp
+form :: Props -> JSX
+form props = make comp
   { render
   , initialState: { textVal: Nothing }
   } props
   where
-    update :: Self Props TextEntryScreenState -> Action -> StateUpdate Props TextEntryScreenState
+    update :: Self Props NoteEntryScreenState -> Action -> StateUpdate Props NoteEntryScreenState
     update self =
       case _ of
         AddItem ->
           SideEffects doAddItem
             where
-              doAddItem :: Self Props TextEntryScreenState -> Effect Unit
+              doAddItem :: Self Props NoteEntryScreenState -> Effect Unit
               doAddItem self' = do
                 now' <- now
                 let
                   nextEntry =
-                    TextItem $ maybe "" identity self'.state.textVal
+                    NoteItem $ maybe "" identity self'.state.textVal
                 self'.props.onEntryComplete nextEntry
 
     send = runUpdate update
@@ -60,10 +56,10 @@ logEntryScreen props = make comp
            , key: self.props.key
            , children:
              [ text { key: "instructions"
-                    , children: [ string "Choose entry type:" ]
+                    , children: [ string "Note:" ]
                     }
              , textInput { key: "txtinput"
-                         , placeholder: "Enter entry text here"
+                         , placeholder: "Enter note text here"
                          , style: css { flex: 1
                                       , borderWidth: 1
                                       , borderColor: "black"
