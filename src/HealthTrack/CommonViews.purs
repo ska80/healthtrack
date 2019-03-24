@@ -1,4 +1,4 @@
-module CommonViews where
+module HealthTrack.CommonViews where
 
 import Prelude
 

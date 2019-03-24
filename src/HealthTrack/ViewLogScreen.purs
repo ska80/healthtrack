@@ -1,12 +1,12 @@
-module ViewLogScreen where
+module HealthTrack.ViewLogScreen where
 
 import Prelude
 
-import CommonViews as CV
 import Data.Array (fromFoldable)
 import Effect (Effect)
+import HealthTrack.CommonViews as CV
+import HealthTrack.Model (AppState, Screen(..), Item, CreatedAtInst(..), ItemEntry(..))
 import HealthTrack.TimeUtil as TimeUtil
-import Model (AppState, Screen(..), Item, CreatedAtInst(..), ItemEntry(..))
 import React.Basic (JSX, Component, StateUpdate(..), make, runUpdate, createComponent, Self)
 import React.Basic.DOM (css)
 import React.Basic.DOM.Events (capture_)

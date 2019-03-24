@@ -1,4 +1,4 @@
-module AddEntryScreen where
+module HealthTrack.ItemEntryScreen.AddEntryScreen where
 
 import Prelude
 
@@ -8,7 +8,7 @@ import Effect.Now (now)
 import HealthTrack.ItemEntryScreen.Note as IENote
 import HealthTrack.ItemEntryScreen.Symptom as IESymptom
 import HealthTrack.Time (UTCInst(..))
-import Model (AppState, ItemEntry, Screen(..), CreatedAtInst(..))
+import HealthTrack.Model (AppState, ItemEntry, Screen(..), CreatedAtInst(..))
 import React.Basic (StateUpdate(..), JSX, make, runUpdate, Component, createComponent, Self)
 import React.Basic.DOM (css)
 import React.Basic.DOM.Events (capture_)

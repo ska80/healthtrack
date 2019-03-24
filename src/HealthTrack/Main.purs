@@ -1,19 +1,19 @@
-module Main where
+module HealthTrack.Main where
 
 import Prelude
 
 import Data.Either (Either(..))
-import DeveloperScreen as DeveloperScreen
 import Effect (Effect)
 import Effect.Aff (Aff, launchAff)
 import Effect.Class (liftEffect)
 import Effect.Console (log)
-import AddEntryScreen as AddEntryScreen
-import MenuScreen as MenuScreen
-import Model (AppState, Screen(..), initialState)
+import HealthTrack.ItemEntryScreen.AddEntryScreen as AddEntryScreen
+import HealthTrack.DeveloperScreen as DeveloperScreen
+import HealthTrack.MenuScreen as MenuScreen
+import HealthTrack.Model (AppState, Screen(..), initialState)
+import HealthTrack.Storage as Storage
+import HealthTrack.ViewLogScreen as ViewLogScreen
 import React.Basic (Self, StateUpdate(..), JSX, make, runUpdate, Component, createComponent)
-import Storage as Storage
-import ViewLogScreen as ViewLogScreen
 
 comp :: Component {}
 comp = createComponent "Main"

@@ -1,4 +1,4 @@
-module Util where
+module HealthTrack.Util where
 
 -- import Prelude
 

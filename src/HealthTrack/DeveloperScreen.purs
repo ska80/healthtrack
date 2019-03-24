@@ -1,9 +1,9 @@
-module DeveloperScreen where
+module HealthTrack.DeveloperScreen where
 
 import Prelude
 
 import Effect (Effect)
-import Model (AppState, ppAppState)
+import HealthTrack.Model (AppState, ppAppState)
 import React.Basic (JSX, Component, makeStateless, createComponent)
 import React.Basic.DOM.Events (capture_)
 import React.Basic.Native (button, view, text, string)

@@ -4,13 +4,13 @@ import Prelude
 
 import Data.Maybe (Maybe(..), maybe)
 import Effect (Effect)
-import Model (ItemEntry(..))
+import HealthTrack.Model (ItemEntry(..))
 import React.Basic (StateUpdate(..), JSX, make, runUpdate, Component, createComponent, Self)
 import React.Basic.DOM (css)
 import React.Basic.DOM.Events (capture_, capture)
 import React.Basic.Native (text, string, button, view, textInput)
 import Effect.Now (now)
-import Util as Util
+import HealthTrack.Util as Util
 
 comp :: Component Props
 comp = createComponent "AddNoteEntryScreen"

@@ -1,8 +1,9 @@
-module MenuScreen where
+module HealthTrack.MenuScreen where
+
+import Prelude
 
 import Effect (Effect)
-import Model (Screen(..))
-import Prelude (Unit)
+import HealthTrack.Model (Screen(..))
 import React.Basic (JSX, Component, makeStateless, createComponent)
 import React.Basic.DOM (css)
 import React.Basic.DOM.Events (capture_)

@@ -1,4 +1,4 @@
-module Storage where
+module HealthTrack.Storage where
 
 import Prelude
 
@@ -9,7 +9,7 @@ import Effect.Class (liftEffect)
 import Effect.Console (log)
 import Effect.Aff.Compat (EffectFnAff, fromEffectFnAff)
 import Foreign (Foreign, MultipleErrors, fail, ForeignError(..), unsafeToForeign)
-import Model (AppState, Screen(..), Item, CreatedAtInst(..), ItemEntry(..))
+import HealthTrack.Model (AppState, Screen(..), Item, CreatedAtInst(..), ItemEntry(..))
 import Data.DateTime.Instant (instant)
 import Data.Time.Duration (Milliseconds(..))
 import Data.Traversable (traverse)
