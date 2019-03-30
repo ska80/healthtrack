@@ -7,6 +7,17 @@ import HealthTrack.Model (AppState, ppAppState)
 import React.Basic (JSX, Component, makeStateless, createComponent)
 import React.Basic.DOM.Events (capture_)
 import React.Basic.Native (button, view, text, string)
+import HealthTrack.AutoComplete (autoComplete)
+
+symptoms :: Array String
+symptoms =
+  [ "headache"
+  , "stomach pain"
+  , "joint pain - back"
+  , "joint pain - hands"
+  , "joint pain - hands"
+  ]
+
 
 type Props =
   { returnToMenuE :: Effect Unit
@@ -23,12 +34,25 @@ developerScreen props' = makeStateless comp render props'
       view { children }
       where
         children =
-          [ button { title: "< Menu"
-                   , key: "MenuButton"
-                   , onPress: capture_ props.returnToMenuE
-                   }
-
-          , text { children: [ string $ ppAppState props.appState ]
+          [ text { children: [ string $ "enter symptom name:" ]
                  , key: "debugOutputTextArea"
                  }
+
+          , view {key: "yerp",
+                  children: [
+                    autoComplete { onEntryComplete: \x-> pure unit
+                                 , key: "foo"
+                                 , initialEntries: symptoms
+                                 }
+                    ]
+                 }
+          -- ,
+          --   button { title: "< Menu"
+          --          , key: "MenuButton"
+          --          , onPress: capture_ props.returnToMenuE
+          --          }
+
+          -- , text { children: [ string $ ppAppState props.appState ]
+          --        , key: "debugOutputTextArea"
+          --        }
           ]

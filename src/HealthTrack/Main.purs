@@ -50,10 +50,10 @@ main = make comp
                   pure state
         appState' <- appState
 
-        -- if we left off on another screen, ensure we return to this screen
-        let appState'' = appState' { currentScreen = MenuScreen }
+        -- -- if we left off on another screen, ensure we return to this screen
+        -- let appState'' = appState' { currentScreen = MenuScreen }
 
-        liftEffect $ self.setState(const appState'')
+        liftEffect $ self.setState(const appState')
         liftEffect $ (log "Launched! (didMount Aff Finale)" :: Effect Unit)
       pure unit
 

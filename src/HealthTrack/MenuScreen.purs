@@ -26,7 +26,8 @@ menu props' = makeStateless comp render props'
            }
       where
         buttonElements =
-          [ button { title: "Add Entry"
+          [
+            button { title: "Add Entry"
                    , key: "AddItemScreenButton"
                    , onPress: capture_ (props.onMenuClick AddItemScreen)
                    }

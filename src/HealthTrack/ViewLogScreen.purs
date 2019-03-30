@@ -10,8 +10,9 @@ import HealthTrack.TimeUtil as TimeUtil
 import React.Basic (JSX, Component, StateUpdate(..), make, runUpdate, createComponent, Self)
 import React.Basic.DOM (css)
 import React.Basic.DOM.Events (capture_)
-import React.Basic.Native (text, string, button, view, flatList, ListRenderItem, FlatListPropsItemSeparatorComponent)
+import React.Basic.Native (text, string, button, view, flatList,  FlatListPropsItemSeparatorComponent)
 import Unsafe.Coerce (unsafeCoerce)
+import HealthTrack.Util (toListRenderItem)
 
 comp :: Component Props
 comp = createComponent "ViewLogScreen"
@@ -54,9 +55,6 @@ viewLogScreen props = make comp
                         }
              ]
            }
-
-toListRenderItem :: ({ item :: Item } -> JSX) -> ListRenderItem
-toListRenderItem = unsafeCoerce
 
 toFlatListPropsItemSeparatorComponent :: ({ highlighted :: Boolean } -> JSX) -> FlatListPropsItemSeparatorComponent
 toFlatListPropsItemSeparatorComponent = unsafeCoerce
