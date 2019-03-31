@@ -100,7 +100,7 @@ autoComplete props = make comp
       let
         backgroundColor =
           if item.key == "CREATE_OPTION" then
-            "black"
+            "lightgrey"
           else
             "transparent"
       in
@@ -111,7 +111,6 @@ autoComplete props = make comp
                         }
                  ]
             }
-
     entriesWithCreateOption :: Self Props State -> List Entry
     entriesWithCreateOption self =
       let
@@ -141,45 +140,82 @@ autoComplete props = make comp
       let
         entries :: List Entry
         entries = entriesWithCreateOption self
-
       in
-       view { -- style: css { -- padding: 10
-              --                            , width: "100%"
-              --                            , flexDirection: "column"
-              --                            }
+       -- keyboardAvoidingView
+       view { style: css {
+                 -- ,
+                 -- padding: 10
+                 -- ,
+                 width: "100%"
+                 -- ,
+                 -- flexDirection: "column"
+                 -- ,
+                 -- flex: 1
+                 -- ,
+                 -- justifyContent: "center"
+                 -- ,
+                 -- alignItems: "stretch"
+                 -- ,
+                 -- borderColor: "green"
+                 -- ,
+                 -- borderWidth: 1
+                 ,
+                 height: 500
+                 }
 
-              --               -- , behavior: toKbdAvdPropBehv "padding"
-              --               -- , enabled: true
-              --               ,
+                            -- , behavior: toKbdAvdPropBehv "padding"
+                            -- , enabled: true
+            ,
               key: self.props.key
-                            , children:
-                              [ flatList { data: unsafeCoerce $ fromFoldable $ take numOptionsToShow entries
-                                         , key: "itemsList"
-                                         , renderItem: toListRenderItem $ renderItem self
-                                         -- , style: css { flex: 1 }
-                                         }
+            ,
+              children:
 
+              [
 
-                              , textInput { key: "symptomTypeInput"
-                                          , placeholder: "Enter type here, or select from list"
-                                          , style: css { borderWidth: 1
-                                                       , borderColor: "black"
-                                                       -- , padding: 5
-                                                       , width: "100%"
-                                                       -- , height: 50
-                                                       -- , flex: 1
-                                                       }
-                                          , onChange: (capture Util.getText (send self <<< InputUpdate))
-                                          , value: maybe "" identity self.state.textVal
-                                            -- , onSubmitEditing: (capture_ $ send self AddItem )
-                                            -- TODO maybe reenable autocorrect? seems like there
-                                            -- should be a better way to fix the weird way the
-                                            -- app was re-populating the field. idk.
-                                          , autoCorrect: false
-                                            -- , multiline: true
-                                          }
-                              ]
+                view {
+                   style: css {height: 200}
+                   ,
+                   key: "flatListWrap"
+                   ,
+                   children: [
+                     flatList { data: unsafeCoerce $ fromFoldable $ -- take numOptionsToShow
+                                    entries
+                              , key: "itemsList"
+                              , renderItem: toListRenderItem $ renderItem self
+                              , style: css {
+                                -- height: 200
+                                -- ,
+                                -- borderColor: "blue"
+                                -- ,
+                                -- borderWidth: 1
+
+                                }
+                              }
+
+                     ]
+                   }
+              , textInput { key: "symptomTypeInput"
+                          , placeholder: "Enter type here, or select from list"
+                          , style: css {
+                            borderWidth: 1
+                            ,
+                            borderColor: "black"
+                            ,
+                            width: 200
+                            ,
+                            height: 30
                             }
+                          , onChange: (capture Util.getText (send self <<< InputUpdate))
+                          , value: maybe "" identity self.state.textVal
+                            -- , onSubmitEditing: (capture_ $ send self AddItem )
+                            -- TODO maybe reenable autocorrect? seems like there
+                            -- should be a better way to fix the weird way the
+                            -- app was re-populating the field. idk.
+                          , autoCorrect: false
+                            -- , multiline: true
+                          }
+              ]
+            }
 
 toKbdAvdPropBehv :: String -> KeyboardAvoidingViewPropsBehavior
 toKbdAvdPropBehv = unsafeCoerce
