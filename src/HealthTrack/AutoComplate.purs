@@ -22,6 +22,7 @@ type Props =
   { onEntryComplete :: ItemEntry -> Effect Unit
   , key :: String
   , initialEntries :: Array String
+  , addCreateEntry :: Boolean
     -- TODO pass in data??
     -- or maybe have some kind of a callback thing that controls everything?
     -- onTextChange -- do something whenever input chagnes
@@ -99,7 +100,7 @@ autoComplete props = make comp
       let
         backgroundColor =
           if item.key == "CREATE_OPTION" then
-            "steelblue"
+            "black"
           else
             "transparent"
       in
@@ -111,9 +112,10 @@ autoComplete props = make comp
                  ]
             }
 
-    entriesWithCreateOption :: State -> List Entry
-    entriesWithCreateOption state =
+    entriesWithCreateOption :: Self Props State -> List Entry
+    entriesWithCreateOption self =
       let
+        state = self.state
         mval = state.textVal
         entries = state.entries
 
@@ -121,49 +123,52 @@ autoComplete props = make comp
           { key: "CREATE_OPTION"
           , val: "Create \"" <> val <> "\""
           }
-       in
-        case mval of
-          Just text ->
-            newEntryForText text : entries
-          Nothing ->
-            state.entries
+      in
+       if self.props.addCreateEntry then
+         case mval of
+           Just text ->
+             newEntryForText text : entries
+           Nothing ->
+             entries
+       else
+         entries
+
+    -- make take 5 portion configurable somehow?
+    numOptionsToShow = 5
 
     render :: Self Props State -> JSX
     render self =
       let
         entries :: List Entry
-        entries = entriesWithCreateOption self.state
+        entries = entriesWithCreateOption self
 
       in
-       keyboardAvoidingView { -- style: css {
-                              --    -- flexDirection: "column",
-                              --    -- padding: 50
-                              --    -- ,
-                              --    width: "100%"
-                              --    -- , height: "100%"
-                              --    }
-                            -- ,
-                            behavior: toKbdAvdPropBehv "padding"
-                            , enabled: true
-                            , key: self.props.key
+       view { -- style: css { -- padding: 10
+              --                            , width: "100%"
+              --                            , flexDirection: "column"
+              --                            }
+
+              --               -- , behavior: toKbdAvdPropBehv "padding"
+              --               -- , enabled: true
+              --               ,
+              key: self.props.key
                             , children:
-                              -- make take 5 portion configurable somehow?
-                              [ flatList { data: unsafeCoerce $ fromFoldable $ take 5 entries
+                              [ flatList { data: unsafeCoerce $ fromFoldable $ take numOptionsToShow entries
                                          , key: "itemsList"
                                          , renderItem: toListRenderItem $ renderItem self
+                                         -- , style: css { flex: 1 }
                                          }
+
 
                               , textInput { key: "symptomTypeInput"
                                           , placeholder: "Enter type here, or select from list"
-                                          , style: css {
-
-                                            -- flex: 1
-                                            --            ,
-                                            borderWidth: 1
-                                            , borderColor: "black"
-                                            , padding: 5
-                                            , width: "100%"
-                                            }
+                                          , style: css { borderWidth: 1
+                                                       , borderColor: "black"
+                                                       -- , padding: 5
+                                                       , width: "100%"
+                                                       -- , height: 50
+                                                       -- , flex: 1
+                                                       }
                                           , onChange: (capture Util.getText (send self <<< InputUpdate))
                                           , value: maybe "" identity self.state.textVal
                                             -- , onSubmitEditing: (capture_ $ send self AddItem )
@@ -174,6 +179,7 @@ autoComplete props = make comp
                                             -- , multiline: true
                                           }
                               ]
-                              }
+                            }
+
 toKbdAvdPropBehv :: String -> KeyboardAvoidingViewPropsBehavior
 toKbdAvdPropBehv = unsafeCoerce

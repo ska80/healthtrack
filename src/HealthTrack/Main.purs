@@ -40,20 +40,17 @@ main = make comp
           appState =
               case loaded of
                 Left errors -> do
-                  liftEffect (log "Errors loading:" :: Effect Unit)
+                  liftEffect $ log "Errors loading:" :: Effect Unit
                   liftEffect $ log $ show errors
                   liftEffect $ log "End Errors loading"
                   pure initialState
-                Right (state :: AppState) -> do
+                Right state -> do
                   liftEffect $ log "loaded AppState"
                   liftEffect $ log $ show state
                   pure state
         appState' <- appState
 
-        -- -- if we left off on another screen, ensure we return to this screen
-        -- let appState'' = appState' { currentScreen = MenuScreen }
-
-        liftEffect $ self.setState(const appState')
+        liftEffect $ self.setState (const appState')
         liftEffect $ (log "Launched! (didMount Aff Finale)" :: Effect Unit)
       pure unit
 

@@ -15,7 +15,6 @@ symptoms =
   , "stomach pain"
   , "joint pain - back"
   , "joint pain - hands"
-  , "joint pain - hands"
   ]
 
 
@@ -38,11 +37,12 @@ developerScreen props' = makeStateless comp render props'
                  , key: "debugOutputTextArea"
                  }
 
-          , view {key: "yerp",
+          , view {key: "testing automcomp key",
                   children: [
                     autoComplete { onEntryComplete: \x-> pure unit
                                  , key: "foo"
                                  , initialEntries: symptoms
+                                 , addCreateEntry: true
                                  }
                     ]
                  }
