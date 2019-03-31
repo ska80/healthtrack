@@ -7,7 +7,7 @@ import HealthTrack.Model (AppState, ppAppState)
 import React.Basic (JSX, Component, makeStateless, createComponent)
 import React.Basic.DOM.Events (capture_)
 import React.Basic.Native (button, view, text, string)
-import HealthTrack.AutoComplete (autoComplete)
+import HealthTrack.AutoComplete (autoComplete, Action(..), Entry)
 import React.Basic.DOM (css)
 
 symptoms :: Array String
@@ -31,15 +31,29 @@ developerScreen :: Props -> JSX
 developerScreen props' = makeStateless comp render props'
   where
     render props =
-      view { style: css { paddingTop: 50 }
+      view { style: css { paddingTop: 70 }
            , children }
       where
         children =
-          [ text { children: [ string $ "enter symptom name:" ]
+          [
+            button { title: "< Menu"
+                   , key: "MenuButton"
+                   , onPress: capture_ props.returnToMenuE
+                   }
+          ,
+            text { children: [
+                      string $ "enter symptom name, "
+                      ]
                  , key: "debugOutputTextArea"
                  }
-
-          , view {
+          ,
+            text { children: [
+                      string $ "or select from list:"
+                      ]
+                 , key: "debugOutputTextArea2"
+                 }
+          ,
+            view {
                key: "testing automcomp key"
                ,
                style: css {
@@ -52,23 +66,19 @@ developerScreen props' = makeStateless comp render props'
                  -- borderWidth: 1
                  }
                ,
-                  children: [
-                    autoComplete { onEntryComplete: \x-> pure unit
-                                 , key: "foo"
-                                 , initialEntries: symptoms
-                                 , addCreateEntry: true
-                                 }
+               children: [
+                 autoComplete { onEntryComplete: \x-> pure unit
+                              , key: "foo"
+                              , initialEntries: symptoms
+                              , addCreateEntry: true
+                              , handler: eventHandler
+                              -- , userState: unit
+                              }
+                 ]
 
-                    ]
-
-                 }
-          -- ,
-          --   button { title: "< Menu"
-          --          , key: "MenuButton"
-          --          , onPress: capture_ props.returnToMenuE
-          --          }
-
-          -- , text { children: [ string $ ppAppState props.appState ]
-          --        , key: "debugOutputTextArea"
-          --        }
+               }
           ]
+
+        -- eventHandler ::
+        eventHandler act =
+          pure unit

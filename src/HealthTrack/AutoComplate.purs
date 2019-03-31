@@ -19,11 +19,13 @@ import HealthTrack.Util (toListRenderItem)
 import Debug.Trace (spy)
 
 type Props =
+-- type Props a = forall a .
   { onEntryComplete :: ItemEntry -> Effect Unit
   , key :: String
   , initialEntries :: Array String
   , addCreateEntry :: Boolean
-    -- TODO pass in data??
+  , handler :: Action -> Effect Unit
+  -- , userState :: a
     -- or maybe have some kind of a callback thing that controls everything?
     -- onTextChange -- do something whenever input chagnes
     -- onCreateNew -- user presses return or clicks the `Create "whatever"` btn
@@ -32,9 +34,11 @@ type Props =
   }
 
 type State =
+-- type State a = forall a .
   { textVal :: Maybe String
   , entries :: List Entry
   , nextId :: Int
+  -- , userState :: a
   }
 
 type Entry =
@@ -42,11 +46,7 @@ type Entry =
   , val :: String
   }
 
--- TODO create component
--- render list
--- rerun list logic on text input
---
-
+-- comp :: forall a . Component (Props a)
 comp :: Component Props
 comp = createComponent "AutoComplete"
 
@@ -59,23 +59,23 @@ fixupInitialEntries =
 data Action
   = InputUpdate (Maybe String)
   | EntryPress Entry
+  | AddItem
 
+-- autoComplete :: forall a . Props a -> JSX
 autoComplete :: Props -> JSX
 autoComplete props = make comp
   { render
-  , initialState: { textVal: Nothing, entries: initialEntries, nextId}
+  , initialState
   } props
   where
+    initialState =
+      { textVal: Nothing
+      , entries: initialEntries
+      -- , userState: props.userState
+      , nextId
+      }
     initialEntries = fixupInitialEntries props.initialEntries
     nextId = List.length initialEntries
-    -- TODO make this user-configrable
-    nextAutocompEntries :: Maybe String -> State -> List Entry
-    nextAutocompEntries input state =
-      let
-        idn = show state.nextId
-        input' = maybe "" identity input
-      in
-       {key: idn, val: input' <> idn } : state.entries
 
     update :: Self Props State -> Action -> StateUpdate Props State
     update self action =
@@ -89,12 +89,16 @@ autoComplete props = make comp
                                , entries = entries
                                , nextId = self.state.nextId + 1
                                }
+
         EntryPress entry ->
-          let foo = spy "entryPress" entry in
+          NoUpdate
+
+        AddItem ->
           NoUpdate
 
     send = runUpdate update
 
+    -- renderItem :: forall a . Self (Props a) (State a) -> {item :: Entry} -> JSX
     renderItem :: Self Props State -> {item :: Entry} -> JSX
     renderItem self {item} =
       let
@@ -119,8 +123,10 @@ autoComplete props = make comp
         entries = state.entries
 
         newEntryForText val =
-          { key: "CREATE_OPTION"
-          , val: "Create \"" <> val <> "\""
+          {
+            key: "CREATE_OPTION"
+          ,
+            val: "Create \"" <> val <> "\""
           }
       in
        if self.props.addCreateEntry then
@@ -133,7 +139,7 @@ autoComplete props = make comp
          entries
 
     -- make take 5 portion configurable somehow?
-    numOptionsToShow = 5
+    -- numOptionsToShow = 5
 
     render :: Self Props State -> JSX
     render self =
@@ -159,63 +165,76 @@ autoComplete props = make comp
                  -- borderColor: "green"
                  -- ,
                  -- borderWidth: 1
-                 ,
-                 height: 500
+                 -- ,
+                 -- height: 500
                  }
 
-                            -- , behavior: toKbdAvdPropBehv "padding"
-                            -- , enabled: true
+              -- , behavior: toKbdAvdPropBehv "padding"
+              -- , enabled: true
             ,
               key: self.props.key
             ,
               children:
-
               [
-
+                textInput {
+                   key: "symptomTypeInput"
+                   ,
+                   placeholder: "Enter here"
+                   ,
+                   style: css {
+                     borderWidth: 1
+                     ,
+                     borderColor: "black"
+                     ,
+                     width: 200
+                     ,
+                     height: 30
+                     }
+                   ,
+                   onChange: (capture Util.getText (send self <<< InputUpdate))
+                   ,
+                   value: maybe "" identity self.state.textVal
+                   ,
+                   onSubmitEditing: (capture_ $ send self AddItem)
+                   ,
+                   autoCorrect: false
+                   }
+              ,
                 view {
                    style: css {height: 200}
                    ,
                    key: "flatListWrap"
                    ,
                    children: [
-                     flatList { data: unsafeCoerce $ fromFoldable $ -- take numOptionsToShow
-                                    entries
-                              , key: "itemsList"
-                              , renderItem: toListRenderItem $ renderItem self
-                              , style: css {
-                                -- height: 200
-                                -- ,
-                                -- borderColor: "blue"
-                                -- ,
-                                -- borderWidth: 1
-
-                                }
-                              }
-
+                     flatList {
+                        data: unsafeCoerce $ fromFoldable $ entries
+                        ,
+                        key: "itemsList"
+                        ,
+                        renderItem: toListRenderItem $ renderItem self
+                        ,
+                        style: css {
+                          -- height: 200
+                          -- ,
+                          -- borderColor: "blue"
+                          -- ,
+                          -- borderWidth: 1
+                                   }
+                        }
                      ]
                    }
-              , textInput { key: "symptomTypeInput"
-                          , placeholder: "Enter type here, or select from list"
-                          , style: css {
-                            borderWidth: 1
-                            ,
-                            borderColor: "black"
-                            ,
-                            width: 200
-                            ,
-                            height: 30
-                            }
-                          , onChange: (capture Util.getText (send self <<< InputUpdate))
-                          , value: maybe "" identity self.state.textVal
-                            -- , onSubmitEditing: (capture_ $ send self AddItem )
-                            -- TODO maybe reenable autocorrect? seems like there
-                            -- should be a better way to fix the weird way the
-                            -- app was re-populating the field. idk.
-                          , autoCorrect: false
-                            -- , multiline: true
-                          }
               ]
             }
+
+nextAutocompEntries :: Maybe String -> State -> List Entry
+nextAutocompEntries input state =
+  let
+    idn = show state.nextId
+    input' = maybe "" identity input
+  in
+   {key: idn, val: input' <> idn } : state.entries
+
+
 
 toKbdAvdPropBehv :: String -> KeyboardAvoidingViewPropsBehavior
 toKbdAvdPropBehv = unsafeCoerce
