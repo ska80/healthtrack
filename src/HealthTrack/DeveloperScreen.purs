@@ -8,7 +8,11 @@ import React.Basic (JSX, Component, makeStateless, createComponent)
 import React.Basic.DOM.Events (capture_)
 import React.Basic.Native (button, view, text, string)
 import HealthTrack.AutoComplete (autoComplete, Action(..), Entry)
+import HealthTrack.AutoComplete as AC
 import React.Basic.DOM (css)
+import Data.String as Str
+import Data.List as List
+import Data.Maybe (maybe)
 
 symptoms :: Array String
 symptoms =
@@ -79,6 +83,8 @@ developerScreen props' = makeStateless comp render props'
                }
           ]
 
-        -- eventHandler ::
-        eventHandler act =
-          pure unit
+        eventHandler mtext entries =
+          pure $ maybe entries filterEntries mtext
+          where
+            filterEntries txt =
+              List.filter (Str.contains (Str.Pattern (Str.toLower txt)) <<< Str.toLower <<< _.val) entries

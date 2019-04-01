@@ -18,13 +18,13 @@ import Data.List as List
 import HealthTrack.Util (toListRenderItem)
 import Debug.Trace (spy)
 
+-- type Props =
 type Props =
--- type Props a = forall a .
   { onEntryComplete :: ItemEntry -> Effect Unit
   , key :: String
   , initialEntries :: Array String
   , addCreateEntry :: Boolean
-  , handler :: Action -> Effect Unit
+  , handler :: Maybe String -> List Entry -> Effect (List Entry)
   -- , userState :: a
     -- or maybe have some kind of a callback thing that controls everything?
     -- onTextChange -- do something whenever input chagnes
@@ -50,6 +50,7 @@ type Entry =
 comp :: Component Props
 comp = createComponent "AutoComplete"
 
+
 fixupInitialEntries :: Array String -> List Entry
 fixupInitialEntries =
   List.fromFoldable <<< mapWithIndex toEntry
@@ -74,27 +75,29 @@ autoComplete props = make comp
       -- , userState: props.userState
       , nextId
       }
+
     initialEntries = fixupInitialEntries props.initialEntries
+
     nextId = List.length initialEntries
 
     update :: Self Props State -> Action -> StateUpdate Props State
     update self action =
       case action of
-        InputUpdate mtext ->
-          let
-            idn = show self.state.nextId
-            entries = nextAutocompEntries mtext self.state
-          in
-           Update $ self.state { textVal = mtext
-                               , entries = entries
-                               , nextId = self.state.nextId + 1
-                               }
+         InputUpdate mtext ->
+           let
+             idn = show self.state.nextId
+             entriesE = self.props.handler mtext self.state.entries
+             state' = self.state { textVal = mtext }
+           in
+            UpdateAndSideEffects state' \self -> do
+              entries <- entriesE
+              self.setState $ _ { entries = entries }
 
-        EntryPress entry ->
-          NoUpdate
+         EntryPress entry ->
+           NoUpdate
 
-        AddItem ->
-          NoUpdate
+         AddItem ->
+           NoUpdate
 
     send = runUpdate update
 
@@ -225,15 +228,14 @@ autoComplete props = make comp
                    }
               ]
             }
-
-nextAutocompEntries :: Maybe String -> State -> List Entry
-nextAutocompEntries input state =
-  let
-    idn = show state.nextId
-    input' = maybe "" identity input
-  in
-   {key: idn, val: input' <> idn } : state.entries
-
+-- TODO add this for the enter/selection thing
+-- nextAutocompEntries :: Maybe String -> State -> List Entry
+-- nextAutocompEntries input state =
+--   let
+--     idn = show state.nextId
+--     input' = maybe "" identity input
+--   in
+--    {key: idn, val: input' <> idn } : state.entries
 
 
 toKbdAvdPropBehv :: String -> KeyboardAvoidingViewPropsBehavior
