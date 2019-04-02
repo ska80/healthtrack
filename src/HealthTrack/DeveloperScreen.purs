@@ -12,15 +12,23 @@ import HealthTrack.AutoComplete as AC
 import React.Basic.DOM (css)
 import Data.String as Str
 import Data.List as List
+import Data.List (List)
 import Data.Maybe (maybe)
+import Data.Array (mapWithIndex)
 
-symptoms :: Array String
-symptoms =
+symptoms :: List AC.Entry
+symptoms = fixupInitialEntries
   [ "headache"
   , "stomach pain"
   , "joint pain - back"
   , "joint pain - hands"
   ]
+
+fixupInitialEntries :: Array String -> List Entry
+fixupInitialEntries =
+  List.fromFoldable <<< mapWithIndex toEntry
+  where
+    toEntry id val = { key: show id, val }
 
 
 type Props =
@@ -83,8 +91,8 @@ developerScreen props' = makeStateless comp render props'
                }
           ]
 
-        eventHandler mtext entries =
-          pure $ maybe entries filterEntries mtext
+        eventHandler mtext entries nextId =
+          pure $ AC.Response (maybe symptoms filterEntries mtext) nextId
           where
             filterEntries txt =
-              List.filter (Str.contains (Str.Pattern (Str.toLower txt)) <<< Str.toLower <<< _.val) entries
+              List.filter (Str.contains (Str.Pattern (Str.toLower txt)) <<< Str.toLower <<< _.val) symptoms

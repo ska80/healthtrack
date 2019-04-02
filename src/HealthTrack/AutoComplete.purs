@@ -12,19 +12,20 @@ import React.Basic.Native (text, string, button, view, keyboardAvoidingView, tex
 import Effect.Now (now)
 import HealthTrack.Util as Util
 import Unsafe.Coerce (unsafeCoerce)
-import Data.Array (fromFoldable, mapWithIndex)
+-- import Data.Array (fromFoldable, mapWithIndex)
 import Data.List (List(..), (:), take)
 import Data.List as List
 import HealthTrack.Util (toListRenderItem)
 import Debug.Trace (spy)
+import Data.Array as Array
 
 -- type Props =
 type Props =
   { onEntryComplete :: ItemEntry -> Effect Unit
   , key :: String
-  , initialEntries :: Array String
+  , initialEntries :: List Entry
   , addCreateEntry :: Boolean
-  , handler :: Maybe String -> List Entry -> Effect (List Entry)
+  , handler :: Maybe String -> List Entry -> Int -> Effect Response
   -- , userState :: a
     -- or maybe have some kind of a callback thing that controls everything?
     -- onTextChange -- do something whenever input chagnes
@@ -51,16 +52,12 @@ comp :: Component Props
 comp = createComponent "AutoComplete"
 
 
-fixupInitialEntries :: Array String -> List Entry
-fixupInitialEntries =
-  List.fromFoldable <<< mapWithIndex toEntry
-  where
-    toEntry id val = { key: show id, val }
-
 data Action
   = InputUpdate (Maybe String)
   | EntryPress Entry
   | AddItem
+
+data Response = Response (List Entry) Int
 
 -- autoComplete :: forall a . Props a -> JSX
 autoComplete :: Props -> JSX
@@ -72,11 +69,10 @@ autoComplete props = make comp
     initialState =
       { textVal: Nothing
       , entries: initialEntries
-      -- , userState: props.userState
       , nextId
       }
 
-    initialEntries = fixupInitialEntries props.initialEntries
+    initialEntries = props.initialEntries
 
     nextId = List.length initialEntries
 
@@ -86,12 +82,14 @@ autoComplete props = make comp
          InputUpdate mtext ->
            let
              idn = show self.state.nextId
-             entriesE = self.props.handler mtext self.state.entries
+             entriesE = self.props.handler mtext self.state.entries self.state.nextId
              state' = self.state { textVal = mtext }
            in
             UpdateAndSideEffects state' \self -> do
-              entries <- entriesE
-              self.setState $ _ { entries = entries }
+              (Response entries nextId) <- entriesE
+              self.setState $ \s-> s { entries = entries
+                                     , nextId = nextId
+                                     }
 
          EntryPress entry ->
            NoUpdate
@@ -210,7 +208,7 @@ autoComplete props = make comp
                    ,
                    children: [
                      flatList {
-                        data: unsafeCoerce $ fromFoldable $ entries
+                        data: unsafeCoerce $ Array.fromFoldable $ entries
                         ,
                         key: "itemsList"
                         ,
