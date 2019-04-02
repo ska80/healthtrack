@@ -58,41 +58,14 @@ developerScreen props' = makeStateless comp render props'
                       ]
                  , key: "debugOutputTextArea"
                  }
-          ,
-            text { children: [
-                      string $ "or select from list:"
-                      ]
-                 , key: "debugOutputTextArea2"
-                 }
-          ,
-            view {
-               key: "testing automcomp key"
-               ,
-               style: css {
-                 height: "100%"
-                 ,
-                 width: "100%"
-                 -- ,
-                 -- borderColor: "red"
-                 -- ,
-                 -- borderWidth: 1
-                 }
-               ,
-               children: [
-                 autoComplete { onEntryComplete: \x-> pure unit
-                              , key: "foo"
-                              , initialEntries: symptoms
-                              , addCreateEntry: true
-                              , handler: eventHandler
-                              -- , userState: unit
-                              }
-                 ]
 
-               }
+          ,
+            button { title: "< Menu"
+                   , key: "MenuButton"
+                   , onPress: capture_ props.returnToMenuE
+                   }
+
+          , text { children: [ string $ ppAppState props.appState ]
+                 , key: "debugOutputTextArea"
+                 }
           ]
-
-        eventHandler mtext entries nextId =
-          pure $ AC.Response (maybe symptoms filterEntries mtext) nextId
-          where
-            filterEntries txt =
-              List.filter (Str.contains (Str.Pattern (Str.toLower txt)) <<< Str.toLower <<< _.val) symptoms

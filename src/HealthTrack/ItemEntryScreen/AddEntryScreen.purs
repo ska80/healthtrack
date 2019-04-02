@@ -42,7 +42,8 @@ type AddEntryScreenState =
 logEntryScreen :: Props -> JSX
 logEntryScreen props = make comp
   { render
-  , initialState: { appState: props.state, currentScreen: ChooseNewEntryType }
+  , initialState: { appState: props.state, currentScreen: SymptomEntryType -- ChooseNewEntryType
+                  }
   } props
   where
     update :: Self Props AddEntryScreenState -> Action

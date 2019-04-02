@@ -14,6 +14,13 @@ import HealthTrack.Util as Util
 import Unsafe.Coerce (unsafeCoerce)
 import Data.Array (fromFoldable)
 import HealthTrack.Util (toListRenderItem)
+import Data.String as Str
+import Data.List as List
+import Data.List (List)
+import Data.Maybe (maybe)
+import Data.Array (mapWithIndex)
+import HealthTrack.AutoComplete (autoComplete, Entry)
+import HealthTrack.AutoComplete as AC
 
 comp :: Component Props
 comp = createComponent "AddSymptomEntryScreen"
@@ -62,50 +69,32 @@ form props = make comp
              [ text { key: "instructions"
                     , children: [ string "Type:" ]
                     }
+            ,
+               view {
+               key: "testing automcomp key"
+               ,
+               style: css {
+                 height: "100%"
+                 ,
+                 width: "100%"
+                 -- ,
+                 -- borderColor: "red"
+                 -- ,
+                 -- borderWidth: 1
+                 }
+               ,
+               children: [
+                 autoComplete { onEntryComplete: \x-> pure unit
+                              , key: "foo"
+                              , initialEntries: symptoms
+                              , addCreateEntry: true
+                              , handler: eventHandler
+                              -- , userState: unit
+                              }
+                 ]
 
-             , flatList { data: unsafeCoerce $ fromFoldable [ { key: "0"}, {key: "1"} ]
-                        , key: "itemsList"
-                        , renderItem: toListRenderItem renderItem
-                        -- , "ItemSeparatorComponent": toFlatListPropsItemSeparatorComponent separator
+               }
 
-                        -- , "ItemSeparatorComponent": toFlatListPropsItemSeparatorComponent separator
-                        }
-
-             , textInput { key: "symptomTypeInput"
-                         , placeholder: "Enter type here, or select from list"
-                         , style: css { flex: 1
-                                      , borderWidth: 1
-                                      , borderColor: "black"
-                                      , padding: 5
-                                      , width: "100%"
-                                      }
-                         , onChange: (capture Util.getText setStateText)
-                         , value: maybe "" identity self.state.textVal
-                         , onSubmitEditing: (capture_ $ send self AddItem )
-                           -- TODO maybe reenable autocorrect? seems like there
-                           -- should be a better way to fix the weird way the
-                           -- app was re-populating the field. idk.
-                         , autoCorrect: false
-                         -- , multiline: true
-                         }
-
-             , textInput { key: "txtinput"
-                         , placeholder: "Enter symtom description here"
-                         , style: css { flex: 1
-                                      , borderWidth: 1
-                                      , borderColor: "black"
-                                      , padding: 5
-                                      , width: "100%"
-                                      }
-                         , onChange: (capture Util.getText setStateText)
-                         , value: maybe "" identity self.state.textVal
-                         , onSubmitEditing: (capture_ $ send self AddItem )
-                           -- TODO maybe reenable autocorrect? seems like there
-                           -- should be a better way to fix the weird way the
-                           -- app was re-populating the field. idk.
-                         , autoCorrect: false
-                         , multiline: true
-                         }
              , button { title: "save"
                       , key: "clickyButton"
                       , onPress: (capture_ $ send self AddItem )
@@ -115,3 +104,34 @@ form props = make comp
         where
           setStateText tv =
             self.setState _ { textVal = tv }
+          eventHandler mtext entries nextId =
+            pure $ AC.Response (maybe symptoms filterEntries mtext) nextId
+            where
+              filterEntries :: String -> List Entry
+              filterEntries str =
+                List.filter (hasStr str) symptoms
+
+              hasStr :: String -> Entry -> Boolean
+              hasStr str =
+                let
+                  entryPattern = Str.Pattern (Str.toLower str)
+                in
+                 Str.contains entryPattern <<< Str.toLower <<< _.val
+
+
+
+
+
+symptoms :: List AC.Entry
+symptoms = fixupInitialEntries
+  [ "headache"
+  , "stomach pain"
+  , "joint pain - back"
+  , "joint pain - hands"
+  ]
+
+fixupInitialEntries :: Array String -> List Entry
+fixupInitialEntries =
+  List.fromFoldable <<< mapWithIndex toEntry
+  where
+    toEntry id val = { key: show id, val }

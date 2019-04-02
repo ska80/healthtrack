@@ -109,7 +109,7 @@ loadAndInitializeAppState = do
     makeThing parsed =
       { nextId : parsed.nextId
       , items: parsed.items
-      , currentScreen : DeveloperScreen
+      , currentScreen : AddItemScreen
       , userTZOffset : tzOffset
       }
   pure $ (makeThing <$> parseSavedState val)
