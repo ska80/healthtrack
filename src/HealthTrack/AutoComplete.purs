@@ -20,7 +20,7 @@ import Data.Array as Array
 
 -- type Props =
 type Props =
-  { onEntryComplete :: Entry -> Effect Unit
+  { onItemSelected :: Entry -> Effect Unit
   , key :: String
   , initialEntries :: List Entry
   , addCreateEntry :: Boolean
@@ -91,7 +91,7 @@ autoComplete props = make comp
                                      }
 
          EntryPress entry ->
-           SideEffects \self -> self.props.onEntryComplete entry
+           SideEffects \self -> self.props.onItemSelected entry
 
          AddItem ->
            let
@@ -101,7 +101,7 @@ autoComplete props = make comp
              newEntry = { key: show self.state.nextId, val: itemText }
              newState = self.state { nextId = nextId' }
 
-             sendComplete self = self.props.onEntryComplete newEntry
+             sendComplete self = self.props.onItemSelected newEntry
            in
             UpdateAndSideEffects newState sendComplete
 

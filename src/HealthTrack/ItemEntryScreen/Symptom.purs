@@ -77,7 +77,7 @@ form props = make comp
             , style: css { height: "100%"
                          , width: "100%"
                          }
-            , children: [ AC.autoComplete { onEntryComplete: entryComplete
+            , children: [ AC.autoComplete { onItemSelected: itemSelected
                                           , key: "foo"
                                           , initialEntries: symptoms
                                           , addCreateEntry: true
@@ -91,7 +91,7 @@ form props = make comp
                , children: [ string $ val]
                }
 
-        entryComplete entry =
+        itemSelected entry =
           send self $ TextSelected entry
 
         setStateText tv =
