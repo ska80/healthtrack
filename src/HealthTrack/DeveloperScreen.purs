@@ -30,7 +30,6 @@ fixupInitialEntries =
   where
     toEntry id val = { key: show id, val }
 
-
 type Props =
   { returnToMenuE :: Effect Unit
   , appState :: AppState
@@ -47,24 +46,10 @@ developerScreen props' = makeStateless comp render props'
            , children }
       where
         children =
-          [
-            button { title: "< Menu"
+          [ button { title: "< Menu"
                    , key: "MenuButton"
                    , onPress: capture_ props.returnToMenuE
                    }
-          ,
-            text { children: [
-                      string $ "enter symptom name, "
-                      ]
-                 , key: "debugOutputTextArea"
-                 }
-
-          ,
-            button { title: "< Menu"
-                   , key: "MenuButton"
-                   , onPress: capture_ props.returnToMenuE
-                   }
-
           , text { children: [ string $ ppAppState props.appState ]
                  , key: "debugOutputTextArea"
                  }
