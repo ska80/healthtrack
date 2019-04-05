@@ -19,14 +19,16 @@ import Data.List as List
 import Data.List (List)
 import Data.Maybe (maybe)
 import Data.Array (mapWithIndex)
-import HealthTrack.AutoComplete (autoComplete, Entry)
 import HealthTrack.AutoComplete as AC
+
+import Debug.Trace (spy)
 
 comp :: Component Props
 comp = createComponent "AddSymptomEntryScreen"
 
 data Action
   = AddItem
+  | TextSelected AC.Entry
 
 type Props =
   { onEntryComplete :: ItemEntry -> Effect Unit
@@ -35,17 +37,25 @@ type Props =
 
 type State =
   { textVal :: Maybe String
+  , selectedText :: Maybe AC.Entry
   }
 
 form :: Props -> JSX
 form props = make comp
   { render
-  , initialState: { textVal: Nothing }
+  , initialState: { textVal: Nothing, selectedText: Nothing }
   } props
   where
     update :: Self Props State -> Action -> StateUpdate Props State
     update self =
       case _ of
+        TextSelected entry ->
+          let
+            -- spy' = spy "TextSelected" entry
+            nextState = self.state { selectedText = Just entry}
+          in
+           Update nextState
+
         AddItem ->
           SideEffects doAddItem
             where
@@ -60,67 +70,64 @@ form props = make comp
     send = runUpdate update
 
     render self =
-      let renderItem {item} = text { children : [ string "string" ]} in
-      view { style: css { flexDirection: "column", padding: 50
-                        , width: "100%", height: "100%"
-                        }
-           , key: self.props.key
-           , children:
-             [ text { key: "instructions"
-                    , children: [ string "Type:" ]
-                    }
-            ,
-               view {
-               key: "testing automcomp key"
-               ,
-               style: css {
-                 height: "100%"
-                 ,
-                 width: "100%"
-                 -- ,
-                 -- borderColor: "red"
-                 -- ,
-                 -- borderWidth: 1
-                 }
-               ,
-               children: [
-                 autoComplete { onEntryComplete: \x-> pure unit
-                              , key: "foo"
-                              , initialEntries: symptoms
-                              , addCreateEntry: true
-                              , handler: eventHandler
-                              -- , userState: unit
-                              }
-                 ]
+      let
+        renderItem {item} = text { children : [ string "string" ] }
+        autoComp =
+          view { key: "typeAutocomplete"
+            , style: css { height: "100%"
+                         , width: "100%"
+                         }
+            , children: [ AC.autoComplete { onEntryComplete: entryComplete
+                                          , key: "foo"
+                                          , initialEntries: symptoms
+                                          , addCreateEntry: true
+                                          , handler: inputChangeHandler
+                                          }
+                        ]
+            }
 
+        symptomTypeText {val}=
+          text { key: "symptom label"
+               , children: [ string $ val]
                }
 
-             , button { title: "save"
-                      , key: "clickyButton"
-                      , onPress: (capture_ $ send self AddItem )
-                      }
-             ]
+        entryComplete entry =
+          send self $ TextSelected entry
+
+        setStateText tv =
+          self.setState _ { textVal = tv }
+
+        inputChangeHandler mtext entries nextId =
+          pure $ AC.Response (maybe symptoms filterEntries mtext) nextId
+          where
+            filterEntries :: String -> List AC.Entry
+            filterEntries str =
+              List.filter (hasStr str) symptoms
+
+            hasStr :: String -> AC.Entry -> Boolean
+            hasStr str =
+              let
+                entryPattern = Str.Pattern (Str.toLower str)
+              in
+               Str.contains entryPattern <<< Str.toLower <<< _.val
+      in
+       view { style: css { flexDirection: "column"
+                         , padding: 50
+                         , width: "100%"
+                         , height: "100%"
+                         }
+            , key: self.props.key
+            , children:
+              [ text { key: "instructions"
+                     , children: [ string "Symptom type:" ]
+                     }
+              , maybe autoComp symptomTypeText self.state.selectedText
+              , button { title: "save"
+                       , key: "clickyButton"
+                       , onPress: (capture_ $ send self AddItem )
+                       }
+              ]
            }
-        where
-          setStateText tv =
-            self.setState _ { textVal = tv }
-          eventHandler mtext entries nextId =
-            pure $ AC.Response (maybe symptoms filterEntries mtext) nextId
-            where
-              filterEntries :: String -> List Entry
-              filterEntries str =
-                List.filter (hasStr str) symptoms
-
-              hasStr :: String -> Entry -> Boolean
-              hasStr str =
-                let
-                  entryPattern = Str.Pattern (Str.toLower str)
-                in
-                 Str.contains entryPattern <<< Str.toLower <<< _.val
-
-
-
-
 
 symptoms :: List AC.Entry
 symptoms = fixupInitialEntries
@@ -130,7 +137,7 @@ symptoms = fixupInitialEntries
   , "joint pain - hands"
   ]
 
-fixupInitialEntries :: Array String -> List Entry
+fixupInitialEntries :: Array String -> List AC.Entry
 fixupInitialEntries =
   List.fromFoldable <<< mapWithIndex toEntry
   where

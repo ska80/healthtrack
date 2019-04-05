@@ -4,7 +4,6 @@ import Prelude
 
 import Data.Maybe (Maybe(..), maybe)
 import Effect (Effect)
-import HealthTrack.Model (ItemEntry(..))
 import React.Basic (StateUpdate(..), JSX, make, runUpdate, Component, createComponent, Self)
 import React.Basic.DOM (css)
 import React.Basic.DOM.Events (capture_, capture)
@@ -21,17 +20,17 @@ import Data.Array as Array
 
 -- type Props =
 type Props =
-  { onEntryComplete :: ItemEntry -> Effect Unit
+  { onEntryComplete :: Entry -> Effect Unit
   , key :: String
   , initialEntries :: List Entry
   , addCreateEntry :: Boolean
   , handler :: Maybe String -> List Entry -> Int -> Effect Response
   -- , userState :: a
-    -- or maybe have some kind of a callback thing that controls everything?
-    -- onTextChange -- do something whenever input chagnes
-    -- onCreateNew -- user presses return or clicks the `Create "whatever"` btn
-    -- onItemSelected -- when user clicks something, or preses return for create new
-    -- etc
+  -- or maybe have some kind of a callback thing that controls everything?
+  -- onTextChange -- do something whenever input chagnes
+  -- onCreateNew -- user presses return or clicks the `Create "whatever"` btn
+  -- onItemSelected -- when user clicks something, or preses return for create new
+  -- etc
   }
 
 type State =
@@ -92,10 +91,20 @@ autoComplete props = make comp
                                      }
 
          EntryPress entry ->
-           NoUpdate
+           SideEffects \self -> self.props.onEntryComplete entry
 
          AddItem ->
-           NoUpdate
+           let
+             itemText = maybe "" identity self.state.textVal
+             nextId' = self.state.nextId + 1
+
+             newEntry = { key: show self.state.nextId, val: itemText }
+             newState = self.state { nextId = nextId' }
+
+             sendComplete self = self.props.onEntryComplete newEntry
+           in
+            UpdateAndSideEffects newState sendComplete
+
 
     send = runUpdate update
 
