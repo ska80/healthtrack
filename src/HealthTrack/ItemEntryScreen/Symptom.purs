@@ -27,7 +27,7 @@ comp :: Component Props
 comp = createComponent "AddSymptomEntryScreen"
 
 data Action
-  = AddItem
+  = SaveItem
   | TextSelected AC.Entry
 
 type Props =
@@ -56,11 +56,11 @@ form props = make comp
           in
            Update nextState
 
-        AddItem ->
-          SideEffects doAddItem
+        SaveItem ->
+          SideEffects doSaveItem
             where
-              doAddItem :: Self Props State -> Effect Unit
-              doAddItem self' = do
+              doSaveItem :: Self Props State -> Effect Unit
+              doSaveItem self' = do
                 now' <- now
                 let
                   nextEntry =
@@ -124,7 +124,7 @@ form props = make comp
               , maybe autoComp symptomTypeText self.state.selectedText
               , button { title: "save"
                        , key: "clickyButton"
-                       , onPress: (capture_ $ send self AddItem )
+                       , onPress: (capture_ $ send self SaveItem )
                        }
               ]
            }
