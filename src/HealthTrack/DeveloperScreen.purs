@@ -16,20 +16,6 @@ import Data.List (List)
 import Data.Maybe (maybe)
 import Data.Array (mapWithIndex)
 
-symptoms :: List AC.Entry
-symptoms = fixupInitialEntries
-  [ "headache"
-  , "stomach pain"
-  , "joint pain - back"
-  , "joint pain - hands"
-  ]
-
-fixupInitialEntries :: Array String -> List Entry
-fixupInitialEntries =
-  List.fromFoldable <<< mapWithIndex toEntry
-  where
-    toEntry id val = { key: show id, val }
-
 type Props =
   { returnToMenuE :: Effect Unit
   , appState :: AppState
