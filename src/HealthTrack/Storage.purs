@@ -109,6 +109,7 @@ loadAndInitializeAppState = do
     makeThing parsed =
       { nextId : parsed.nextId
       , items: parsed.items
+        -- TODO restore to menu screen
       , currentScreen : AddItemScreen
       , userTZOffset : tzOffset
       }

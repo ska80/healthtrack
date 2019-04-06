@@ -64,7 +64,7 @@ form props = make comp
                 now' <- now
                 let
                   nextEntry =
-                    SymptomItem $ maybe "" identity self'.state.textVal
+                    SymptomItem $ maybe "" _.val self'.state.selectedText
                 self'.props.onEntryComplete nextEntry
 
     send = runUpdate update
@@ -141,4 +141,4 @@ fixupInitialEntries :: Array String -> List AC.Entry
 fixupInitialEntries =
   List.fromFoldable <<< mapWithIndex toEntry
   where
-    toEntry id val = { key: show id, val }
+    toEntry id val = { key: show id, val, displayText: val }

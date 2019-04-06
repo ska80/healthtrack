@@ -18,8 +18,7 @@ comp :: Component Props
 comp = createComponent "AddEntryScreen"
 
 data Action
-  = AddItem
-  | SelectEntryType AddEntryScreenType
+  = SelectEntryType AddEntryScreenType
 
 data AddEntryScreenType
   = ChooseNewEntryType
@@ -42,7 +41,9 @@ type AddEntryScreenState =
 logEntryScreen :: Props -> JSX
 logEntryScreen props = make comp
   { render
-  , initialState: { appState: props.state, currentScreen: SymptomEntryType -- ChooseNewEntryType
+  , initialState: { appState: props.state
+                    -- TODO dont forget to restore to original choose new entry screen
+                  , currentScreen: SymptomEntryType -- ChooseNewEntryType
                   }
   } props
   where
@@ -52,9 +53,6 @@ logEntryScreen props = make comp
       case _ of
         SelectEntryType chosenScreen ->
           Update $ self.state { currentScreen = chosenScreen }
-
-        AddItem ->
-          SideEffects (const $ pure unit)
 
     send = runUpdate update
 

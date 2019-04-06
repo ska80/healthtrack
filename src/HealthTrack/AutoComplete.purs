@@ -44,6 +44,7 @@ type State =
 type Entry =
   { key :: String
   , val :: String
+  , displayText :: String
   }
 
 -- comp :: forall a . Component (Props a)
@@ -98,7 +99,7 @@ autoComplete props = make comp
              itemText = maybe "" identity self.state.textVal
              nextId' = self.state.nextId + 1
 
-             newEntry = { key: show self.state.nextId, val: itemText }
+             newEntry = { key: show self.state.nextId, val: itemText, displayText: itemText }
              newState = self.state { nextId = nextId' }
 
              sendComplete self = self.props.onItemSelected newEntry
@@ -133,10 +134,9 @@ autoComplete props = make comp
         entries = state.entries
 
         newEntryForText val =
-          {
-            key: "CREATE_OPTION"
-          ,
-            val: "Create \"" <> val <> "\""
+          { key: "CREATE_OPTION"
+          , displayText: "Create \"" <> val <> "\""
+          , val: val
           }
       in
        if self.props.addCreateEntry then

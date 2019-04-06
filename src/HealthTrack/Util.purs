@@ -1,5 +1,7 @@
 module HealthTrack.Util where
 
+-- module intended to have generic utilities, indpeendent of anything from HealtTrack
+
 -- import Prelude
 
 import React.Basic.Events (EventFn, SyntheticEvent, unsafeEventFn)
@@ -22,5 +24,6 @@ getText = unsafeEventFn \e ->
 toListRenderItem :: forall a . (a -> JSX) -> ListRenderItem
 toListRenderItem = unsafeCoerce
 
-toFlatListPropsItemSeparatorComponent :: ({ highlighted :: Boolean } -> JSX) -> FlatListPropsItemSeparatorComponent
+toFlatListPropsItemSeparatorComponent :: ({ highlighted :: Boolean } -> JSX)
+                                         -> FlatListPropsItemSeparatorComponent
 toFlatListPropsItemSeparatorComponent = unsafeCoerce
