@@ -9,6 +9,7 @@ import HealthTrack.ItemEntryScreen.Note as IENote
 import HealthTrack.ItemEntryScreen.Symptom as IESymptom
 import HealthTrack.Time (UTCInst(..))
 import HealthTrack.Model (AppState, ItemEntry, Screen(..), CreatedAtInst(..))
+import HealthTrack.ModelUtil (addItemEntryToAppState)
 import React.Basic (StateUpdate(..), JSX, make, runUpdate, Component, createComponent, Self)
 import React.Basic.DOM (css)
 import React.Basic.DOM.Events (capture_)
@@ -58,17 +59,7 @@ logEntryScreen props = make comp
 
     onEntryComplete :: Self Props AddEntryScreenState -> ItemEntry -> Effect Unit
     onEntryComplete self' itemEntry = do
-      now' <- now
-      let
-        nextEntry =
-          { key: show self'.state.appState.nextId
-          , entry: itemEntry
-          , createdAt: CreatedAtInst $ UTCInst now'
-          }
-        nextState = self'.state.appState
-          { items =  nextEntry : self'.state.appState.items
-          , nextId = self'.state.appState.nextId + 1
-          }
+      nextState <- addItemEntryToAppState self'.state.appState itemEntry
       self'.setState $ _ { appState = nextState }
       props.onStateUpdate nextState
       props.changeScreen ViewLogScreen
@@ -98,9 +89,9 @@ logEntryScreen props = make comp
                  -- TODO I cant figure out how to *not* need this wrapper view
                  --      If I don't add this i get the unique key warning
                  --      it seems that the issue more specifically is that
-                   --    IEText.element thing is not getting the key i pass as an arg
-                   --    I don't know if I am doing this right though.
-                   --    maybe search the net, or ask the purescript room for advice
+                 --      IEText.element thing is not getting the key i pass as an arg
+                 --      I don't know if I am doing this right though.
+                 --      maybe search the net, or ask the purescript room for advice
                  , view { key: "wrapperView", children }
                  ]
                }

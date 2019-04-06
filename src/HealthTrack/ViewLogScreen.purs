@@ -1,5 +1,8 @@
 module HealthTrack.ViewLogScreen where
 
+-- TODO rename to somethiong better -- like a common rest thing
+-- `ListItemsScreen` etc
+
 import Prelude
 
 import Data.Array (fromFoldable)
