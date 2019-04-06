@@ -17,6 +17,7 @@ You can edit this file as you like.
     , "foreign-generic"
     , "generics-rep"
     , "now"
+    , "undefined"
     , "formatters"
     , "js-date"
     , "simple-moment"

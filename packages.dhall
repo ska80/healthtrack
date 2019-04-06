@@ -133,7 +133,11 @@ let additions =
           , version = "master"
           , dependencies = [] : List Text
           }
-
+      , undefined =
+          { repo = "https://github.com/bklaric/purescript-undefined"
+          , version = "master"
+          , dependencies = [] : List Text
+          }
       }
 
 in  upstream ⫽ overrides ⫽ additions
