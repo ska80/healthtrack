@@ -19,8 +19,9 @@ type AppState =
 -- TODO convert state to be a made up of a list of changes (event source-y)
 -- TODO add more data here: esp date added, date modified
 
-
-ppAppStateOpts :: { maxDepth :: Maybe Int, compactThreshold :: Int }
+ppAppStateOpts :: { maxDepth :: Maybe Int
+                  , compactThreshold :: Int
+                  }
 ppAppStateOpts =
   { maxDepth : Nothing -- always print everything, don't elide
   , compactThreshold : 8
@@ -34,9 +35,6 @@ type Item =
   , entry :: ItemEntry
   , createdAt :: CreatedAtInst
   }
-
--- instance debugItem :: D.Debug Item where
---   debug = D.genericDebug
 
 data ItemEntry
   = FoodItem String

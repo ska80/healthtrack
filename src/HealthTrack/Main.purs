@@ -74,22 +74,25 @@ main = make comp
       send self (ChangeScreen screen)
 
     render self =
-      case self.state.currentScreen of
+      let
+        onStateUpdate newState =
+          self.setState $ const newState
+      in
+       case self.state.currentScreen of
         MenuScreen ->
           MenuScreen.menu { onMenuClick: changeScreen self }
         AddItemScreen ->
           AddEntryScreen.logEntryScreen { state: self.state
-                                        , onStateUpdate:
-                                          \newState ->
-                                             self.setState (\s-> newState)
                                         , returnToMenuE: changeScreen self MenuScreen
                                         , changeScreen: changeScreen self
+                                        , onStateUpdate
                                         }
         ViewLogScreen ->
           ViewLogScreen.viewLogScreen
             { returnToMenuE: changeScreen self MenuScreen
             , state: self.state
             , changeScreen: changeScreen self
+            , onStateUpdate
             }
 
         DeveloperScreen ->

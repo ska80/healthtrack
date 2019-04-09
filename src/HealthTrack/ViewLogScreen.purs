@@ -9,6 +9,7 @@ import Data.Array (fromFoldable)
 import Effect (Effect)
 import HealthTrack.CommonViews as CV
 import HealthTrack.Model (AppState, Screen(..), Item, CreatedAtInst(..), ItemEntry(..))
+import HealthTrack.ModelUtil as MU
 import HealthTrack.TimeUtil as TimeUtil
 import React.Basic (JSX, Component, StateUpdate(..), make, runUpdate, createComponent, Self)
 import React.Basic.DOM (css)
@@ -21,25 +22,42 @@ comp :: Component Props
 comp = createComponent "ViewLogScreen"
 
 data Action
-  = DeleteEntry
+  = DeleteEntry Item
 
 type Props =
   { returnToMenuE :: Effect Unit
   , state :: AppState
   , changeScreen :: Screen -> Effect Unit
+  , onStateUpdate :: AppState -> Effect Unit
   }
+
+type State =
+  { appState :: AppState }
 
 viewLogScreen :: Props -> JSX
 viewLogScreen props = make comp
    { render
-   , initialState: props.state
+   , initialState: { appState: props.state }
    }
    props
   where
+    update :: Self Props State -> Action -> StateUpdate Props State
     update self =
       case _ of
-        DeleteEntry ->
-          NoUpdate
+        DeleteEntry entry ->
+          let
+            newAppState :: AppState
+            newAppState = MU.removeItem self'.state.appState entry
+
+            newState :: State
+            newState = self.state { appState = newAppState }
+
+            doDelete :: Self Props State -> Effect Unit
+            doDelete self' =
+               self'.props.onStateUpdate newAppState
+
+          in
+           UpdateAndSideEffects doDelete
 
     send = runUpdate update
 
@@ -51,7 +69,7 @@ viewLogScreen props = make comp
                       , key: "AddItemScreenButton"
                       , onPress: capture_ (self.props.changeScreen AddItemScreen)
                       }
-             , flatList { data: unsafeCoerce $ fromFoldable self.state.items
+             , flatList { data: unsafeCoerce $ fromFoldable self.state.appState.items
                         , key: "itemsList"
                         , renderItem: toListRenderItem $ renderItem self send
                         , "ItemSeparatorComponent": toFlatListPropsItemSeparatorComponent separator
@@ -68,10 +86,10 @@ separator {highlighted} =
 
 -- TODO add an "edit" button in here somehow
 -- TODO add a delete button also
-renderItem :: Self Props AppState -> (Self Props AppState -> Action -> Effect Unit) -> { item :: Item } -> JSX
+renderItem :: Self Props State -> (Self Props State -> Action -> Effect Unit) -> { item :: Item } -> JSX
 renderItem self send {item} =
   let
-    offset = self.state.userTZOffset
+    offset = self.state.appState.userTZOffset
     (CreatedAtInst utcInst) = item.createdAt
     createdAtFormatted = TimeUtil.utcInstDisplayLocal offset utcInst
     viewChildren =
@@ -80,7 +98,7 @@ renderItem self send {item} =
              , children: [ string createdAtFormatted ] }
       , button { title: "delete"
                , key: "DeleteButton"
-               , onPress: (capture_ $ send self DeleteEntry )
+               , onPress: (capture_ $ send self $ DeleteEntry item)
                }
       ]
   in

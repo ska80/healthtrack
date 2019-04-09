@@ -4,7 +4,7 @@ import Prelude
 
 import Data.Maybe (Maybe(..), maybe)
 import Effect (Effect)
-import HealthTrack.Model (ItemEntry(..))
+import HealthTrack.Model (ItemEntry(..), Item)
 import React.Basic (StateUpdate(..), JSX, make, runUpdate, Component, createComponent, Self)
 import React.Basic.DOM (css)
 import React.Basic.DOM.Events (capture_, capture)
@@ -19,6 +19,7 @@ import Data.List as List
 import Data.List (List)
 import Data.Maybe (maybe)
 import Data.Array (mapWithIndex)
+import Data.Array as Array
 import HealthTrack.AutoComplete as AC
 
 import Debug.Trace (spy)
@@ -33,6 +34,7 @@ data Action
 type Props =
   { onEntryComplete :: ItemEntry -> Effect Unit
   , key :: String
+  , items :: Array Item
   }
 
 type State =
@@ -79,12 +81,14 @@ form props = make comp
                          }
             , children: [ AC.autoComplete { onItemSelected: itemSelected
                                           , key: "foo"
-                                          , initialEntries: symptoms
+                                          , initialEntries: symptoms'
                                           , addCreateEntry: true
                                           , handler: inputChangeHandler
                                           }
                         ]
             }
+
+        symptoms' = symptomSuggestions self.props.items
 
         symptomTypeText {val}=
           text { key: "symptom label"
@@ -98,11 +102,11 @@ form props = make comp
           self.setState _ { textVal = tv }
 
         inputChangeHandler mtext entries nextId =
-          pure $ AC.Response (maybe symptoms filterEntries mtext) nextId
+          pure $ AC.Response (maybe symptoms' filterEntries mtext) nextId
           where
             filterEntries :: String -> List AC.Entry
             filterEntries str =
-              List.filter (hasStr str) symptoms
+              List.filter (hasStr str) symptoms'
 
             hasStr :: String -> AC.Entry -> Boolean
             hasStr str =
@@ -126,19 +130,42 @@ form props = make comp
                        , key: "clickyButton"
                        , onPress: (capture_ $ send self SaveItem )
                        }
-              ]
-           }
+              ]}
 
-symptoms :: List AC.Entry
-symptoms = fixupInitialEntries
+providedSymptoms :: Array String
+providedSymptoms =
   [ "headache"
   , "stomach pain"
   , "joint pain - back"
   , "joint pain - hands"
+  , "joint pain - neck"
   ]
 
 fixupInitialEntries :: Array String -> List AC.Entry
 fixupInitialEntries =
   List.fromFoldable <<< mapWithIndex toEntry
   where
-    toEntry id val = { key: show id, val, displayText: val }
+    toEntry id val = { key: show id, val: val, displayText: val }
+
+symptomSuggestions :: Array Item -> List AC.Entry
+symptomSuggestions items =
+  let
+    entries = _.entry <$> items
+
+    symptomNameFromItemEntry :: ItemEntry -> Maybe String
+    symptomNameFromItemEntry entry =
+      case entry of
+        SymptomItem s ->
+          if Str.length s > 0 then
+            Just s
+          else
+            Nothing
+        _ -> Nothing
+
+    names = Array.mapMaybe symptomNameFromItemEntry entries
+
+    uniqueNames = Array.nubEq names
+
+    allSuggestions = uniqueNames <> providedSymptoms
+  in
+   fixupInitialEntries allSuggestions

@@ -43,7 +43,7 @@ logEntryScreen :: Props -> JSX
 logEntryScreen props = make comp
   { render
   , initialState: { appState: props.state
-                    -- TODO dont forget to restore to original choose new entry screen
+                    -- TODO dont forget to restore original "choose new entry type" screen
                   , currentScreen: SymptomEntryType -- ChooseNewEntryType
                   }
   } props
@@ -72,7 +72,7 @@ logEntryScreen props = make comp
         _ -> renderChooseNewEntryType unit
 
       where
-        wrapperView  children =
+        wrapperView children =
          view { style: css { flexDirection: "column", padding: 50
                             , width: "100%", height: "100%"
                             }
@@ -86,12 +86,6 @@ logEntryScreen props = make comp
                           , key:  "ViewLogButton"
                           , onPress: capture_ (props.changeScreen ViewLogScreen)
                           }
-                 -- TODO I cant figure out how to *not* need this wrapper view
-                 --      If I don't add this i get the unique key warning
-                 --      it seems that the issue more specifically is that
-                 --      IEText.element thing is not getting the key i pass as an arg
-                 --      I don't know if I am doing this right though.
-                 --      maybe search the net, or ask the purescript room for advice
                  , view { key: "wrapperView", children }
                  ]
                }
@@ -100,7 +94,7 @@ logEntryScreen props = make comp
           wrapperView children
           where
             children =
-              [ text { key: "instructionssssss"
+              [ text { key: "instructionsLabel"
                      , children: [ string "Choose entry type:" ]
                      }
               , button { title: "Note"
@@ -115,16 +109,19 @@ logEntryScreen props = make comp
 
 
         renderNoteEntryType _ignored =
-          wrapperView  children
+          wrapperView children
           where
             children =
               [ IENote.form { key: "IENoteElem"
-                            , onEntryComplete: onEntryComplete self } ]
+                            , onEntryComplete: onEntryComplete self
+                            } ]
 
 
         renderSymptomEntryType _ignored =
-          wrapperView  children
+          wrapperView children
           where
             children =
               [ IESymptom.form { key: "IESymptomElem"
-                               , onEntryComplete: onEntryComplete self } ]
+                               , onEntryComplete: onEntryComplete self
+                               , items: self.state.appState.items
+                               } ]

@@ -7,6 +7,7 @@ import Effect.Now (now)
 import HealthTrack.Model (AppState, Item, ItemEntry, Screen(..), CreatedAtInst(..))
 import HealthTrack.Time (UTCInst(..))
 import Data.Array ((:))
+import Data.Array as Array
 
 makeItem :: Int -> ItemEntry -> Effect Item
 makeItem id itemEntry = do
@@ -22,3 +23,11 @@ addItemEntryToAppState appState itemEntry = do
   pure $ appState { items = newItem : appState.items
                   , nextId = appState.nextId + 1
                   }
+
+removeItem :: AppState -> Item -> AppState
+removeItem appState item =
+  let
+    isItem item' = item.key /= item'.key
+    items' = Array.filter isItem appState.items
+  in
+   appState { items = items' }
