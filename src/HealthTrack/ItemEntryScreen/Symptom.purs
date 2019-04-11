@@ -11,7 +11,6 @@ import React.Basic (StateUpdate(..), JSX, make, runUpdate, Component, createComp
 import React.Basic.DOM (css)
 import React.Basic.DOM.Events (capture_)
 import React.Basic.Native (button, string, text, view)
-import Effect.Now (now)
 import Data.String as Str
 import Data.List as List
 import Data.List (List)
@@ -32,14 +31,14 @@ type Props =
   }
 
 type State =
-  { textVal :: Maybe String
+  { description :: Maybe String
   , selectedText :: Maybe AC.Entry
   }
 
 form :: Props -> JSX
 form props = make comp
   { render
-  , initialState: { textVal: Nothing, selectedText: Nothing }
+  , initialState: { description: Nothing, selectedText: Nothing }
   } props
   where
     update :: Self Props State -> Action -> StateUpdate Props State
@@ -56,7 +55,6 @@ form props = make comp
             where
               doSaveItem :: Self Props State -> Effect Unit
               doSaveItem self' = do
-                now' <- now
                 let
                   nextEntry =
                     SymptomItem $ maybe "" _.val self'.state.selectedText
@@ -67,21 +65,24 @@ form props = make comp
     render self =
       let
         renderItem {item} = text { children : [ string "string" ] }
-        autoComp =
-          view { key: "typeAutocomplete"
-            , style: css { height: "100%"
-                         , width: "100%"
-                         }
-            , children: [ AC.autoComplete { onItemSelected: itemSelected
-                                          , key: "foo"
-                                          , initialEntries: symptoms'
-                                          , addCreateEntry: true
-                                          , handler: inputChangeHandler
-                                          }
-                        ]
-            }
 
-        symptoms' = symptomSuggestions self.props.items
+        descriptionAutoComplete =
+          AC.autoComplete { onItemSelected: itemSelected
+                          , key: "descriptionAutoComplete"
+                          , initialEntries: allSymptomSuggestions
+                          , addCreateEntry: true
+                          , handler: inputChangeHandler allSymptomSuggestions
+                          }
+
+        autoCompWrapped =
+          view { key: "DescriptionWrapper"
+               , style: css { height: "100%"
+                            , width: "100%"
+                            }
+               , children: [ descriptionAutoComplete ]
+               }
+
+        allSymptomSuggestions = symptomSuggestions self.props.items
 
         symptomTypeText {val}=
           text { key: "symptom label"
@@ -91,22 +92,6 @@ form props = make comp
         itemSelected entry =
           send self $ TextSelected entry
 
-        setStateText tv =
-          self.setState _ { textVal = tv }
-
-        inputChangeHandler mtext entries nextId =
-          pure $ AC.Response (maybe symptoms' filterEntries mtext) nextId
-          where
-            filterEntries :: String -> List AC.Entry
-            filterEntries str =
-              List.filter (hasStr str) symptoms'
-
-            hasStr :: String -> AC.Entry -> Boolean
-            hasStr str =
-              let
-                entryPattern = Str.Pattern (Str.toLower str)
-              in
-               Str.contains entryPattern <<< Str.toLower <<< _.val
       in
        view { style: css { flexDirection: "column"
                          , padding: 50
@@ -118,12 +103,27 @@ form props = make comp
               [ text { key: "instructions"
                      , children: [ string "Symptom type:" ]
                      }
-              , maybe autoComp symptomTypeText self.state.selectedText
+              , maybe autoCompWrapped symptomTypeText self.state.selectedText
               , button { title: "save"
                        , key: "clickyButton"
                        , onPress: (capture_ $ send self SaveItem )
                        }
               ]}
+
+inputChangeHandler :: List AC.Entry -> Maybe String -> List AC.Entry -> Int -> Effect AC.Response
+inputChangeHandler symptoms' mtext _entries nextId =
+  pure $ AC.Response (maybe symptoms' filterEntries mtext) nextId
+  where
+    filterEntries :: String -> List AC.Entry
+    filterEntries str =
+      List.filter (hasStr str) symptoms'
+
+    hasStr :: String -> AC.Entry -> Boolean
+    hasStr str =
+      let
+        entryPattern = Str.Pattern (Str.toLower str)
+      in
+       Str.contains entryPattern <<< Str.toLower <<< _.val
 
 providedSymptoms :: Array String
 providedSymptoms =
