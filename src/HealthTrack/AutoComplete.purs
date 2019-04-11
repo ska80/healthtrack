@@ -11,7 +11,6 @@ import React.Basic.Native (text, string, button, view, keyboardAvoidingView, tex
 import Effect.Now (now)
 import HealthTrack.Util as Util
 import Unsafe.Coerce (unsafeCoerce)
--- import Data.Array (fromFoldable, mapWithIndex)
 import Data.List (List(..), (:), take)
 import Data.List as List
 import HealthTrack.Util (toListRenderItem)
@@ -169,10 +168,6 @@ autoComplete props = make comp
                      }
               ]
             }
-
-toKbdAvdPropBehv :: String -> KeyboardAvoidingViewPropsBehavior
-toKbdAvdPropBehv = unsafeCoerce
-
 
 -- convert list of strings to a list of entries
 -- useful for populating the autosuggest list

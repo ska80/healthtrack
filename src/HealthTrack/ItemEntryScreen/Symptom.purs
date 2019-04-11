@@ -5,6 +5,8 @@ import Prelude
 import Data.Maybe (Maybe(..), maybe)
 import Effect (Effect)
 import HealthTrack.Model (ItemEntry(..), Item)
+import HealthTrack.Util as Util
+import HealthTrack.ModelUtil as MU
 import React.Basic (StateUpdate(..), JSX, make, runUpdate, Component, createComponent, Self)
 import React.Basic.DOM (css)
 import React.Basic.DOM.Events (capture_)
@@ -13,7 +15,6 @@ import Effect.Now (now)
 import Data.String as Str
 import Data.List as List
 import Data.List (List)
-import Data.Array (mapWithIndex)
 import Data.Array as Array
 import HealthTrack.AutoComplete as AC
 
@@ -133,31 +134,17 @@ providedSymptoms =
   , "joint pain - neck"
   ]
 
-fixupInitialEntries :: Array String -> List AC.Entry
-fixupInitialEntries =
-  List.fromFoldable <<< mapWithIndex toEntry
-  where
-    toEntry id val = { key: show id, val: val, displayText: val }
-
 symptomSuggestions :: Array Item -> List AC.Entry
 symptomSuggestions items =
   let
-    entries = _.entry <$> items
+    -- pull names from item entries for suggestions
+    suggestions =
+      items <#>
+      _.entry #
+      MU.foodItemEntryDescriptions #
+      Util.filterEmptyStrings #
+      Array.nubEq
 
-    symptomNameFromItemEntry :: ItemEntry -> Maybe String
-    symptomNameFromItemEntry entry =
-      case entry of
-        SymptomItem s ->
-          if Str.length s > 0 then
-            Just s
-          else
-            Nothing
-        _ -> Nothing
-
-    names = Array.mapMaybe symptomNameFromItemEntry entries
-
-    uniqueNames = Array.nubEq names
-
-    allSuggestions = uniqueNames <> providedSymptoms
+    allSuggestions = suggestions <> providedSymptoms
   in
-   fixupInitialEntries allSuggestions
+   AC.arrayToEntries allSuggestions

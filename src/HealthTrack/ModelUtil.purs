@@ -2,12 +2,14 @@ module HealthTrack.ModelUtil where
 
 import Prelude
 
+import Data.Array ((:))
 import Effect (Effect)
 import Effect.Now (now)
-import HealthTrack.Model (AppState, Item, ItemEntry, Screen(..), CreatedAtInst(..))
+import HealthTrack.Model (AppState, Item, ItemEntry(..), CreatedAtInst(..))
 import HealthTrack.Time (UTCInst(..))
-import Data.Array ((:))
 import Data.Array as Array
+import Data.Maybe (Maybe(..))
+
 
 makeItem :: Int -> ItemEntry -> Effect Item
 makeItem id itemEntry = do
@@ -31,3 +33,13 @@ removeItem appState item =
     items' = Array.filter isItem appState.items
   in
    appState { items = items' }
+
+foodItemEntryDescription :: ItemEntry -> Maybe String
+foodItemEntryDescription =
+  case _ of
+    SymptomItem s -> Just s
+    _ -> Nothing
+
+foodItemEntryDescriptions :: Array ItemEntry -> Array String
+foodItemEntryDescriptions =
+  Array.mapMaybe foodItemEntryDescription

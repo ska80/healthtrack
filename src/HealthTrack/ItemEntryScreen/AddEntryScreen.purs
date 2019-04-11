@@ -113,7 +113,6 @@ logEntryScreen props = make comp
                             , onEntryComplete: onEntryComplete self
                             } ]
 
-
         renderSymptomEntryType _ignored =
           wrapperView children
           where
