@@ -58,12 +58,10 @@ autoComplete props = make comp
     initialState =
       { textVal: Nothing
       , entries: initialEntries
-      , nextId
+      , nextId: List.length initialEntries
       }
 
     initialEntries = props.initialEntries
-
-    nextId = List.length initialEntries
 
     update :: Self Props State -> Action -> StateUpdate Props State
     update self action =
@@ -174,3 +172,12 @@ autoComplete props = make comp
 
 toKbdAvdPropBehv :: String -> KeyboardAvoidingViewPropsBehavior
 toKbdAvdPropBehv = unsafeCoerce
+
+
+-- convert list of strings to a list of entries
+-- useful for populating the autosuggest list
+arrayToEntries :: Array String -> List Entry
+arrayToEntries =
+  List.fromFoldable <<< Array.mapWithIndex toEntry
+  where
+    toEntry id val = { key: show id, val: val, displayText: val }

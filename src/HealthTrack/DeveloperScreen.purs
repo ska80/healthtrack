@@ -6,7 +6,7 @@ import Effect (Effect)
 import HealthTrack.Model (AppState, ppAppState)
 import React.Basic (JSX, Component, makeStateless, createComponent)
 import React.Basic.DOM.Events (capture_)
-import React.Basic.Native (button, view, text, string)
+import React.Basic.Native (button, scrollView, text, string)
 import HealthTrack.AutoComplete (autoComplete, Action(..), Entry)
 import HealthTrack.AutoComplete as AC
 import React.Basic.DOM (css)
@@ -28,7 +28,7 @@ developerScreen :: Props -> JSX
 developerScreen props' = makeStateless comp render props'
   where
     render props =
-      view { style: css { paddingTop: 70 }
+      scrollView { style: css { paddingTop: 70 }
            , children }
       where
         children =

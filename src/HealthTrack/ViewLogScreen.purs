@@ -47,7 +47,7 @@ viewLogScreen props = make comp
         DeleteEntry entry ->
           let
             newAppState :: AppState
-            newAppState = MU.removeItem self'.state.appState entry
+            newAppState = MU.removeItem self.state.appState entry
 
             newState :: State
             newState = self.state { appState = newAppState }
@@ -55,9 +55,8 @@ viewLogScreen props = make comp
             doDelete :: Self Props State -> Effect Unit
             doDelete self' =
                self'.props.onStateUpdate newAppState
-
           in
-           UpdateAndSideEffects doDelete
+           UpdateAndSideEffects newState doDelete
 
     send = runUpdate update
 
@@ -111,8 +110,8 @@ dispEntryItem :: ItemEntry -> JSX
 dispEntryItem val =
   case val of
     NoteItem theVal ->
-      text { key: "val", children: [ string theVal ] }
+      text { key: "val", children: [ string  $ "Note: " <> theVal ] }
     SymptomItem theVal ->
-      text { key: "val", children: [ string theVal ] }
+      text { key: "val", children: [ string $ "Symptom: " <> theVal ] }
     _ ->
       text { key: "val" , children: [ string "(could not decode)" ] }

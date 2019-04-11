@@ -7,22 +7,15 @@ import Effect (Effect)
 import HealthTrack.Model (ItemEntry(..), Item)
 import React.Basic (StateUpdate(..), JSX, make, runUpdate, Component, createComponent, Self)
 import React.Basic.DOM (css)
-import React.Basic.DOM.Events (capture_, capture)
-import React.Basic.Native (text, string, button, view, textInput, flatList)
+import React.Basic.DOM.Events (capture_)
+import React.Basic.Native (button, string, text, view)
 import Effect.Now (now)
-import HealthTrack.Util as Util
-import Unsafe.Coerce (unsafeCoerce)
-import Data.Array (fromFoldable)
-import HealthTrack.Util (toListRenderItem)
 import Data.String as Str
 import Data.List as List
 import Data.List (List)
-import Data.Maybe (maybe)
 import Data.Array (mapWithIndex)
 import Data.Array as Array
 import HealthTrack.AutoComplete as AC
-
-import Debug.Trace (spy)
 
 comp :: Component Props
 comp = createComponent "AddSymptomEntryScreen"
@@ -53,7 +46,6 @@ form props = make comp
       case _ of
         TextSelected entry ->
           let
-            -- spy' = spy "TextSelected" entry
             nextState = self.state { selectedText = Just entry}
           in
            Update nextState
