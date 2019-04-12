@@ -81,6 +81,10 @@ serializeItem item =
           { _type: "SymptomItem"
           , desc: unsafeToForeign text
           }
+        FoodItem text ->
+          { _type: "FoodItem"
+          , desc: unsafeToForeign text
+          }
         _ ->
           -- TODO fixme
           { _type: "?"
@@ -157,6 +161,8 @@ readItemEntry itemEntryF = do
   case _type of
     "NoteItem" -> readNoteItem itemEntryF
     "SymptomItem" -> readSymptomItem itemEntryF
+    "FoodItem" -> readFoodItem itemEntryF
+
     _ -> readNoteItem itemEntryF
 
 readNoteItem :: F.Foreign -> F.F ItemEntry
@@ -168,3 +174,8 @@ readSymptomItem :: F.Foreign -> F.F ItemEntry
 readSymptomItem itemEntryF = do
   txt <- (FI.readProp "desc" >=> F.readString) itemEntryF
   pure $ SymptomItem txt
+
+readFoodItem :: F.Foreign -> F.F ItemEntry
+readFoodItem itemEntryF = do
+  txt <- (FI.readProp "desc" >=> F.readString) itemEntryF
+  pure $ FoodItem txt

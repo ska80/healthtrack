@@ -5,6 +5,8 @@ import Prelude
 import Effect (Effect)
 import HealthTrack.ItemEntryScreen.Note as IENote
 import HealthTrack.ItemEntryScreen.Symptom as IESymptom
+import HealthTrack.ItemEntryScreen.Food as IEFood
+
 import HealthTrack.Model (AppState, ItemEntry, Screen(..))
 import HealthTrack.ModelUtil (addItemEntryToAppState)
 import React.Basic (StateUpdate(..), JSX, make, runUpdate, Component, createComponent, Self)
@@ -41,7 +43,9 @@ logEntryScreen props = make comp
   { render
   , initialState: { appState: props.state
                     -- TODO dont forget to restore original "choose new entry type" screen
-                  , currentScreen: SymptomEntryType -- ChooseNewEntryType
+                  -- , currentScreen: SymptomEntryType -- ChooseNewEntryType
+                  , currentScreen: ChooseNewEntryType
+
                   }
   } props
   where
@@ -66,7 +70,7 @@ logEntryScreen props = make comp
         ChooseNewEntryType -> renderChooseNewEntryType unit
         NoteEntryType -> renderNoteEntryType unit
         SymptomEntryType -> renderSymptomEntryType unit
-        _ -> renderChooseNewEntryType unit
+        FoodEntryType -> renderFoodEntryType unit
 
       where
         wrapperView children =
@@ -102,6 +106,10 @@ logEntryScreen props = make comp
                        , key: "symptombutton"
                        , onPress: capture_ (send self $ SelectEntryType SymptomEntryType)
                        }
+              , button { title: "Food"
+                       , key: "foodbutton"
+                       , onPress: capture_ (send self $ SelectEntryType FoodEntryType)
+                       }
               ]
 
 
@@ -118,6 +126,15 @@ logEntryScreen props = make comp
           where
             children =
               [ IESymptom.form { key: "IESymptomElem"
+                               , onEntryComplete: onEntryComplete self
+                               , items: self.state.appState.items
+                               } ]
+
+        renderFoodEntryType _ignored =
+          wrapperView children
+          where
+            children =
+              [ IEFood.form { key: "IEFoodElem"
                                , onEntryComplete: onEntryComplete self
                                , items: self.state.appState.items
                                } ]

@@ -141,7 +141,7 @@ symptomSuggestions items =
     suggestions =
       items <#>
       _.entry #
-      MU.foodItemEntryDescriptions #
+      MU.symptomItemEntryDescriptions #
       Util.filterEmptyStrings #
       Array.nubEq
 

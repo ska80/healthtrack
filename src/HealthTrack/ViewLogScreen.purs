@@ -113,5 +113,7 @@ dispEntryItem val =
       text { key: "val", children: [ string  $ "Note: " <> theVal ] }
     SymptomItem theVal ->
       text { key: "val", children: [ string $ "Symptom: " <> theVal ] }
+    FoodItem theVal ->
+      text { key: "val", children: [ string $ "Food: " <> theVal ] }
     _ ->
       text { key: "val" , children: [ string "(could not decode)" ] }

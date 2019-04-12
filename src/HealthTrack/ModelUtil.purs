@@ -43,3 +43,14 @@ foodItemEntryDescription =
 foodItemEntryDescriptions :: Array ItemEntry -> Array String
 foodItemEntryDescriptions =
   Array.mapMaybe foodItemEntryDescription
+
+
+symptomItemEntryDescription :: ItemEntry -> Maybe String
+symptomItemEntryDescription =
+  case _ of
+    SymptomItem s -> Just s
+    _ -> Nothing
+
+symptomItemEntryDescriptions :: Array ItemEntry -> Array String
+symptomItemEntryDescriptions =
+  Array.mapMaybe symptomItemEntryDescription

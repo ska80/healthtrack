@@ -143,7 +143,7 @@ autoComplete props = make comp
             , key: self.props.key
             , children:
               [
-                textInput { key: "symptomTypeInput"
+                textInput { key: "autocompletetextinput"
                           , placeholder: "Enter here"
                           , style: css { borderWidth: 1
                                        , borderColor: "black"
