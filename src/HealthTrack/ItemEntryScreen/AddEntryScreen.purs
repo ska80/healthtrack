@@ -3,6 +3,7 @@ module HealthTrack.ItemEntryScreen.AddEntryScreen where
 import Prelude
 
 import Effect (Effect)
+import Effect.Uncurried (EffectFn1)
 import HealthTrack.ItemEntryScreen.Note as IENote
 import HealthTrack.ItemEntryScreen.Symptom as IESymptom
 import HealthTrack.ItemEntryScreen.Food as IEFood
@@ -10,8 +11,9 @@ import HealthTrack.ItemEntryScreen.Food as IEFood
 import HealthTrack.Model (AppState, ItemEntry, Screen(..))
 import HealthTrack.ModelUtil (addItemEntryToAppState)
 import React.Basic (StateUpdate(..), JSX, make, runUpdate, Component, createComponent, Self)
-import React.Basic.DOM (css)
+import React.Basic.DOM (css, CSS)
 import React.Basic.DOM.Events (capture_)
+import React.Basic.Events (SyntheticEvent)
 import React.Basic.Native (text, string, button, view)
 
 comp :: Component Props
@@ -42,8 +44,6 @@ logEntryScreen :: Props -> JSX
 logEntryScreen props = make comp
   { render
   , initialState: { appState: props.state
-                    -- TODO dont forget to restore original "choose new entry type" screen
-                  -- , currentScreen: SymptomEntryType -- ChooseNewEntryType
                   , currentScreen: ChooseNewEntryType
 
                   }
@@ -74,12 +74,11 @@ logEntryScreen props = make comp
 
       where
         wrapperView children =
-         view { style: css { flexDirection: "column", padding: 50
-                            , width: "100%", height: "100%"
-                            }
-               , key:  "WrapperView2"
+         view { style: styles.wrapper
+              , key:  "WrapperView2"
                , children:
-                 [ button { title: "< Menu"
+                 [
+                   button { title: "< Menu"
                           , key:  "MenuButton"
                           , onPress: capture_ props.returnToMenuE
                           }
@@ -97,19 +96,23 @@ logEntryScreen props = make comp
             children =
               [ text { key: "instructionsLabel"
                      , children: [ string "Choose entry type:" ]
+                     , style: styles.instructions
                      }
-              , button { title: "Note"
-                       , key: "NoteButton"
-                       , onPress: capture_ (send self $ SelectEntryType NoteEntryType)
-                       }
-              , button { title: "Symptom"
-                       , key: "symptombutton"
-                       , onPress: capture_ (send self $ SelectEntryType SymptomEntryType)
-                       }
-              , button { title: "Food"
-                       , key: "foodbutton"
-                       , onPress: capture_ (send self $ SelectEntryType FoodEntryType)
-                       }
+              , wButton { title: "Note"
+                        , key: "NoteButton"
+                        , onPress: capture_ (send self $ SelectEntryType NoteEntryType)
+                        , style: styles.choiceButton
+                        }
+              , wButton { title: "Symptom"
+                        , key: "symptombutton"
+                        , onPress: capture_ (send self $ SelectEntryType SymptomEntryType)
+                        , style: styles.choiceButton
+                        }
+              , wButton { title: "Food"
+                        , key: "foodbutton"
+                        , onPress: capture_ (send self $ SelectEntryType FoodEntryType)
+                        , style: styles.choiceButton
+                        }
               ]
 
 
@@ -119,7 +122,8 @@ logEntryScreen props = make comp
             children =
               [ IENote.form { key: "IENoteElem"
                             , onEntryComplete: onEntryComplete self
-                            } ]
+                            }
+]
 
         renderSymptomEntryType _ignored =
           wrapperView children
@@ -138,3 +142,24 @@ logEntryScreen props = make comp
                                , onEntryComplete: onEntryComplete self
                                , items: self.state.appState.items
                                } ]
+    styles = { instructions: css { alignSelf: "center"
+                                 , margin: 20
+                                 }
+             , wrapper: css { flexDirection: "column"
+                            , padding: 50
+                            , width: "100%"
+                            , height: "100%"
+                            }
+             , choiceButton: css { margin: 20 }
+             }
+
+wButton :: { title :: String, key :: String, onPress :: EffectFn1 SyntheticEvent Unit, style :: CSS } -> JSX
+wButton props =
+  view { key: props.key
+       , style: props.style
+       , children: [ button { title: props.title
+                            , key: props.key
+                            , onPress: props.onPress
+                            }
+                   ]
+       }
