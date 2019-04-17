@@ -37,13 +37,12 @@ removeItem appState item =
 foodItemEntryDescription :: ItemEntry -> Maybe String
 foodItemEntryDescription =
   case _ of
-    SymptomItem s -> Just s
+    FoodItem s -> Just s
     _ -> Nothing
 
 foodItemEntryDescriptions :: Array ItemEntry -> Array String
 foodItemEntryDescriptions =
   Array.mapMaybe foodItemEntryDescription
-
 
 symptomItemEntryDescription :: ItemEntry -> Maybe String
 symptomItemEntryDescription =
