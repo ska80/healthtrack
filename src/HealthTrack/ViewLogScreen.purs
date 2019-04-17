@@ -61,7 +61,7 @@ viewLogScreen props = make comp
     send = runUpdate update
 
     render self =
-      view { style: css {flexDirection: "column", padding: 100}
+      view { style: css {flexDirection: "column", paddingTop: 90, padding: 50, width: "100%" }
            , children:
              [ CV.returnToMenuButton self.props
              , button { title: "Add New Entry"

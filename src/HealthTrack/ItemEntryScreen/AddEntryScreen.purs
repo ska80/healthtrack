@@ -40,12 +40,15 @@ type AddEntryScreenState =
   , appState :: AppState
   }
 
+-- TODO make all the screens that should go "back" to the prev screen go to the "choose"
+-- screen do it
+
 logEntryScreen :: Props -> JSX
 logEntryScreen props = make comp
   { render
   , initialState: { appState: props.state
+                  -- , currentScreen: NoteEntryType
                   , currentScreen: ChooseNewEntryType
-
                   }
   } props
   where
@@ -74,18 +77,23 @@ logEntryScreen props = make comp
 
       where
         wrapperView children =
-         view { style: styles.wrapper
-              , key:  "WrapperView2"
+          view { style: styles.wrapper
+               , key:  "WrapperView2"
                , children:
-                 [
-                   button { title: "< Menu"
-                          , key:  "MenuButton"
-                          , onPress: capture_ props.returnToMenuE
-                          }
-                 , button { title: "View Existing Entries"
-                          , key:  "ViewLogButton"
-                          , onPress: capture_ (props.changeScreen ViewLogScreen)
-                          }
+                 [ view { style: styles.headerButtonsWrap
+                        , key: "headerButtonWrapper"
+                        , children: [ wButton { title: "< Menu"
+                                              , key:  "MenuButton"
+                                              , onPress: capture_ props.returnToMenuE
+                                              , style: css {}
+                                              }
+                                    , wButton { title: "Existing Entries"
+                                              , key:  "ViewLogButton"
+                                              , onPress: capture_ (props.changeScreen ViewLogScreen)
+                                              , style: css {}
+                                              }
+                                    ]
+                        }
                  , view { key: "wrapperView", children }
                  ]
                }
@@ -142,15 +150,19 @@ logEntryScreen props = make comp
                                , onEntryComplete: onEntryComplete self
                                , items: self.state.appState.items
                                } ]
-    styles = { instructions: css { alignSelf: "center"
-                                 , margin: 20
-                                 }
-             , wrapper: css { flexDirection: "column"
+    styles = { wrapper: css { flexDirection: "column"
                             , padding: 50
                             , width: "100%"
                             , height: "100%"
                             }
+             , instructions: css { alignSelf: "center"
+                                 , margin: 20
+                                 , marginTop: 60
+                                 }
              , choiceButton: css { margin: 20 }
+             , headerButtonsWrap: css { flexDirection: "row"
+                                      , justifyContent: "space-between"
+                                      }
              }
 
 wButton :: { title :: String, key :: String, onPress :: EffectFn1 SyntheticEvent Unit, style :: CSS } -> JSX

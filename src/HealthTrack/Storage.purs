@@ -114,7 +114,8 @@ loadAndInitializeAppState = do
       { nextId : parsed.nextId
       , items: parsed.items
         -- TODO restore to menu screen
-      , currentScreen : AddItemScreen
+      , currentScreen : MenuScreen
+      -- , currentScreen : AddItemScreen
       , userTZOffset : tzOffset
       }
   pure $ (makeThing <$> parseSavedState val)

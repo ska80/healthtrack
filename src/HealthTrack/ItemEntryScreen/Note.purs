@@ -51,7 +51,7 @@ form props = make comp
 
     render self =
       view { style: css { flexDirection: "column", padding: 50
-                        , width: "100%", height: "100%"
+                        , width: "100%", height: 400
                         }
            , key: self.props.key
            , children:
