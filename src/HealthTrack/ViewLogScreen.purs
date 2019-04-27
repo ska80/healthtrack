@@ -109,11 +109,13 @@ renderItem self send {item} =
 dispEntryItem :: ItemEntry -> JSX
 dispEntryItem val =
   case val of
-    NoteItem theVal ->
-      text { key: "val", children: [ string  $ "Note: " <> theVal ] }
-    SymptomItem theVal ->
-      text { key: "val", children: [ string $ "Symptom: " <> theVal ] }
     FoodItem theVal ->
       text { key: "val", children: [ string $ "Food: " <> theVal ] }
-    _ ->
-      text { key: "val" , children: [ string "(could not decode)" ] }
+    ConditionItem theVal ->
+      text { key: "val", children: [ string $ "Condition: " <> theVal ] }
+    SymptomItem theVal ->
+      text { key: "val", children: [ string $ "Symptom: " <> theVal ] }
+    ActivityItem theVal ->
+      text { key: "val", children: [ string $ "Activity: " <> theVal ] }
+    NoteItem theVal ->
+      text { key: "val", children: [ string  $ "Note: " <> theVal ] }

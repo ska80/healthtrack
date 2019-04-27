@@ -44,6 +44,16 @@ foodItemEntryDescriptions :: Array ItemEntry -> Array String
 foodItemEntryDescriptions =
   Array.mapMaybe foodItemEntryDescription
 
+conditionItemEntryDescription :: ItemEntry -> Maybe String
+conditionItemEntryDescription =
+  case _ of
+    ConditionItem s -> Just s
+    _ -> Nothing
+
+conditionItemEntryDescriptions :: Array ItemEntry -> Array String
+conditionItemEntryDescriptions =
+  Array.mapMaybe conditionItemEntryDescription
+
 symptomItemEntryDescription :: ItemEntry -> Maybe String
 symptomItemEntryDescription =
   case _ of
@@ -53,3 +63,15 @@ symptomItemEntryDescription =
 symptomItemEntryDescriptions :: Array ItemEntry -> Array String
 symptomItemEntryDescriptions =
   Array.mapMaybe symptomItemEntryDescription
+
+
+
+activityItemEntryDescription :: ItemEntry -> Maybe String
+activityItemEntryDescription =
+  case _ of
+    ActivityItem s -> Just s
+    _ -> Nothing
+
+activityItemEntryDescriptions :: Array ItemEntry -> Array String
+activityItemEntryDescriptions =
+  Array.mapMaybe activityItemEntryDescription

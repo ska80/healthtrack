@@ -4,9 +4,11 @@ import Prelude
 
 import Effect (Effect)
 import Effect.Uncurried (EffectFn1)
-import HealthTrack.ItemEntryScreen.Note as IENote
-import HealthTrack.ItemEntryScreen.Symptom as IESymptom
 import HealthTrack.ItemEntryScreen.Food as IEFood
+import HealthTrack.ItemEntryScreen.Condition as IECondition
+import HealthTrack.ItemEntryScreen.Symptom as IESymptom
+import HealthTrack.ItemEntryScreen.Activity as IEActivity
+import HealthTrack.ItemEntryScreen.Note as IENote
 
 import HealthTrack.Model (AppState, ItemEntry, Screen(..))
 import HealthTrack.ModelUtil (addItemEntryToAppState)
@@ -24,9 +26,11 @@ data Action
 
 data AddEntryScreenType
   = ChooseNewEntryType
-  | NoteEntryType
-  | SymptomEntryType
   | FoodEntryType
+  | ConditionEntryType
+  | SymptomEntryType
+  | ActivityEntryType
+  | NoteEntryType
 
 type Props =
   { state :: AppState
@@ -71,9 +75,11 @@ logEntryScreen props = make comp
     render self =
       case self.state.currentScreen of
         ChooseNewEntryType -> renderChooseNewEntryType unit
-        NoteEntryType -> renderNoteEntryType unit
-        SymptomEntryType -> renderSymptomEntryType unit
         FoodEntryType -> renderFoodEntryType unit
+        ConditionEntryType -> renderConditionEntryType unit
+        SymptomEntryType -> renderSymptomEntryType unit
+        ActivityEntryType -> renderActivityEntryType unit
+        NoteEntryType -> renderNoteEntryType unit
 
       where
         wrapperView children =
@@ -106,9 +112,14 @@ logEntryScreen props = make comp
                      , children: [ string "Choose entry type:" ]
                      , style: styles.instructions
                      }
-              , wButton { title: "Note"
-                        , key: "NoteButton"
-                        , onPress: capture_ (send self $ SelectEntryType NoteEntryType)
+              , wButton { title: "Food"
+                        , key: "foodbutton"
+                        , onPress: capture_ (send self $ SelectEntryType FoodEntryType)
+                        , style: styles.choiceButton
+                        }
+              , wButton { title: "Condition"
+                        , key: "conditionbutton"
+                        , onPress: capture_ (send self $ SelectEntryType ConditionEntryType)
                         , style: styles.choiceButton
                         }
               , wButton { title: "Symptom"
@@ -116,22 +127,35 @@ logEntryScreen props = make comp
                         , onPress: capture_ (send self $ SelectEntryType SymptomEntryType)
                         , style: styles.choiceButton
                         }
-              , wButton { title: "Food"
-                        , key: "foodbutton"
-                        , onPress: capture_ (send self $ SelectEntryType FoodEntryType)
+              , wButton { title: "Activity"
+                        , key: "activitybutton"
+                        , onPress: capture_ (send self $ SelectEntryType ActivityEntryType)
+                        , style: styles.choiceButton
+                        }
+              , wButton { title: "Note"
+                        , key: "NoteButton"
+                        , onPress: capture_ (send self $ SelectEntryType NoteEntryType)
                         , style: styles.choiceButton
                         }
               ]
 
-
-        renderNoteEntryType _ignored =
+        renderFoodEntryType _ignored =
           wrapperView children
           where
             children =
-              [ IENote.form { key: "IENoteElem"
-                            , onEntryComplete: onEntryComplete self
-                            }
-]
+              [ IEFood.form { key: "IEFoodElem"
+                               , onEntryComplete: onEntryComplete self
+                               , items: self.state.appState.items
+                               } ]
+
+        renderConditionEntryType _ignored =
+          wrapperView children
+          where
+            children =
+              [ IECondition.form { key: "IEConditionElem"
+                               , onEntryComplete: onEntryComplete self
+                               , items: self.state.appState.items
+                               } ]
 
         renderSymptomEntryType _ignored =
           wrapperView children
@@ -142,14 +166,24 @@ logEntryScreen props = make comp
                                , items: self.state.appState.items
                                } ]
 
-        renderFoodEntryType _ignored =
+        renderActivityEntryType _ignored =
           wrapperView children
           where
             children =
-              [ IEFood.form { key: "IEFoodElem"
+              [ IEActivity.form { key: "IEActivityElem"
                                , onEntryComplete: onEntryComplete self
                                , items: self.state.appState.items
                                } ]
+
+        renderNoteEntryType _ignored =
+          wrapperView children
+          where
+            children =
+              [ IENote.form { key: "IENoteElem"
+                            , onEntryComplete: onEntryComplete self
+                            }
+]
+
     styles = { wrapper: css { flexDirection: "column"
                             , padding: 50
                             , width: "100%"

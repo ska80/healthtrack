@@ -18,7 +18,7 @@ import Foreign.JSON as FJ
 import Control.Monad.Except (runExcept)
 import Foreign as F
 import Foreign.Index as FI
-import Foreign.NullOrUndefined (null)
+-- import Foreign.NullOrUndefined (null)
 import HealthTrack.Time (UTCInst(..))
 import HealthTrack.TimeUtil (getTZOffset)
 
@@ -73,24 +73,26 @@ serializeItem item =
   let
     serializeItemEntry ie =
       case ie of
-        NoteItem text ->
-          { _type: "NoteItem"
+        FoodItem text ->
+          { _type: "FoodItem"
+          , desc: unsafeToForeign text
+          }
+        ConditionItem text ->
+          { _type: "ConditionItem"
           , desc: unsafeToForeign text
           }
         SymptomItem text ->
           { _type: "SymptomItem"
           , desc: unsafeToForeign text
           }
-        FoodItem text ->
-          { _type: "FoodItem"
+        ActivityItem text ->
+          { _type: "ActivityItem"
           , desc: unsafeToForeign text
           }
-        _ ->
-          -- TODO fixme
-          { _type: "?"
-          , desc: null
+        NoteItem text ->
+          { _type: "NoteItem"
+          , desc: unsafeToForeign text
           }
-
   in
    { createdAt:  item.createdAt
    , key: item.key
@@ -160,23 +162,31 @@ readItemEntry :: F.Foreign -> F.F ItemEntry
 readItemEntry itemEntryF = do
   _type <- (FI.readProp "_type" >=> F.readString) itemEntryF
   case _type of
-    "NoteItem" -> readNoteItem itemEntryF
-    "SymptomItem" -> readSymptomItem itemEntryF
     "FoodItem" -> readFoodItem itemEntryF
+    "ConditionItem" -> readConditionItem itemEntryF
+    "SymptomItem" -> readSymptomItem itemEntryF
+    "ActivityItem" -> readActivityItem itemEntryF
+    "NoteItem" -> readNoteItem itemEntryF
 
     _ -> readNoteItem itemEntryF
 
-readNoteItem :: F.Foreign -> F.F ItemEntry
-readNoteItem itemEntryF = do
-  txt <- (FI.readProp "desc" >=> F.readString) itemEntryF
-  pure $ NoteItem txt
 
-readSymptomItem :: F.Foreign -> F.F ItemEntry
-readSymptomItem itemEntryF = do
+readItemSimple :: (String -> ItemEntry) -> F.Foreign -> F.F ItemEntry
+readItemSimple ctor itemEntryF = do
   txt <- (FI.readProp "desc" >=> F.readString) itemEntryF
-  pure $ SymptomItem txt
+  pure $ ctor txt
 
 readFoodItem :: F.Foreign -> F.F ItemEntry
-readFoodItem itemEntryF = do
-  txt <- (FI.readProp "desc" >=> F.readString) itemEntryF
-  pure $ FoodItem txt
+readFoodItem = readItemSimple FoodItem
+
+readConditionItem :: F.Foreign -> F.F ItemEntry
+readConditionItem = readItemSimple ConditionItem
+
+readSymptomItem :: F.Foreign -> F.F ItemEntry
+readSymptomItem = readItemSimple SymptomItem
+
+readActivityItem :: F.Foreign -> F.F ItemEntry
+readActivityItem = readItemSimple ActivityItem
+
+readNoteItem :: F.Foreign -> F.F ItemEntry
+readNoteItem = readItemSimple NoteItem
