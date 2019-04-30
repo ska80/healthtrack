@@ -1,11 +1,11 @@
 "use strict";
 
-var RN = require('react-native');
+var AsyncStorage = require('@react-native-community/async-storage').default;
 
 exports.storeData_ = function(key) {
   return function(val) {
     return function (onError, onSuccess) {
-      RN.AsyncStorage
+      AsyncStorage
         .setItem(key, val)
         .then(onSuccess)
         .catch(onError);
@@ -20,7 +20,7 @@ exports.storeData_ = function(key) {
 
 exports.retrieveData_ = function (key) {
   return function (onError, onSuccess) { // and callbacks
-    RN.AsyncStorage
+    AsyncStorage
       .getItem(key)
       .then(function(val) {
         return onSuccess(val || "");
