@@ -9,7 +9,7 @@ import Effect.Class (liftEffect)
 import Effect.Console (log)
 import Effect.Aff.Compat (EffectFnAff, fromEffectFnAff)
 import Foreign (Foreign, MultipleErrors, fail, ForeignError(..), unsafeToForeign)
-import HealthTrack.Model (AppState, Screen(..), Item, CreatedAtInst(..), ItemEntry(..))
+import HealthTrack.Model (AppState, Screen(..), Item, CreatedAtInst(..), ItemEntry(..), ItemName(..))
 import Data.DateTime.Instant (instant)
 import Data.Time.Duration (Milliseconds(..))
 import Data.Traversable (traverse)
@@ -167,7 +167,6 @@ readItemEntry itemEntryF = do
     "SymptomItem" -> readSymptomItem itemEntryF
     "ActivityItem" -> readActivityItem itemEntryF
     "NoteItem" -> readNoteItem itemEntryF
-
     _ -> readNoteItem itemEntryF
 
 
@@ -177,7 +176,8 @@ readItemSimple ctor itemEntryF = do
   pure $ ctor txt
 
 readFoodItem :: F.Foreign -> F.F ItemEntry
-readFoodItem = readItemSimple FoodItem
+-- readFoodItem = readItemSimple FoodItem
+readFoodItem = readItemSimple $ FoodItem <<< ItemName
 
 readConditionItem :: F.Foreign -> F.F ItemEntry
 readConditionItem = readItemSimple ConditionItem

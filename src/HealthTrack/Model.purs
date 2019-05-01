@@ -36,8 +36,19 @@ type Item =
   , createdAt :: CreatedAtInst
   }
 
+newtype ItemName = ItemName String
+
+derive instance genericItemName :: Generic ItemName _
+
+instance itemNameShow :: Show ItemName where
+  show = genericShow
+
+instance itemNameDebug :: D.Debug ItemName where
+  debug = D.genericDebug
+
 data ItemEntry
-  = FoodItem String
+  -- = FoodItem String
+  = FoodItem ItemName
     -- food, water, etc
   | ConditionItem String
     -- stress, sickness, etc

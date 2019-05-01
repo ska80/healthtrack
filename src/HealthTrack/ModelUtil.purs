@@ -5,7 +5,7 @@ import Prelude
 import Data.Array ((:))
 import Effect (Effect)
 import Effect.Now (now)
-import HealthTrack.Model (AppState, Item, ItemEntry(..), CreatedAtInst(..))
+import HealthTrack.Model (AppState, Item, ItemEntry(..), CreatedAtInst(..), ItemName(..))
 import HealthTrack.Time (UTCInst(..))
 import Data.Array as Array
 import Data.Maybe (Maybe(..))
@@ -34,13 +34,13 @@ removeItem appState item =
   in
    appState { items = items' }
 
-foodItemEntryDescription :: ItemEntry -> Maybe String
+foodItemEntryDescription :: ItemEntry -> Maybe ItemName
 foodItemEntryDescription =
   case _ of
     FoodItem s -> Just s
     _ -> Nothing
 
-foodItemEntryDescriptions :: Array ItemEntry -> Array String
+foodItemEntryDescriptions :: Array ItemEntry -> Array ItemName
 foodItemEntryDescriptions =
   Array.mapMaybe foodItemEntryDescription
 

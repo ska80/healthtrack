@@ -4,7 +4,7 @@ import Prelude
 
 import Data.Maybe (Maybe(..), maybe)
 import Effect (Effect)
-import HealthTrack.Model (ItemEntry(..), Item)
+import HealthTrack.Model (ItemEntry(..), Item, ItemName(..))
 import HealthTrack.Util as Util
 import HealthTrack.ModelUtil as MU
 import React.Basic (StateUpdate(..), JSX, make, runUpdate, Component, createComponent, Self)
@@ -57,7 +57,7 @@ form props = make comp
               doSaveItem self' = do
                 let
                   nextEntry =
-                    FoodItem $ maybe "" _.val self'.state.selectedText
+                    FoodItem $ ItemName $ maybe "" _.val self'.state.selectedText
                 self'.props.onEntryComplete nextEntry
 
     send = runUpdate update
@@ -136,11 +136,17 @@ providedFoods =
 foodSuggestions :: Array Item -> List AC.Entry
 foodSuggestions items =
   let
+    getItemNameStr :: ItemName -> String
+    getItemNameStr =
+      case _ of
+        ItemName name -> name
     -- pull names from item entries for suggestions
+
     suggestions =
-      items <#>
+       items <#>
       _.entry #
-      MU.foodItemEntryDescriptions #
+      MU.foodItemEntryDescriptions <#>
+      getItemNameStr #
       Util.filterEmptyStrings #
       Array.nubEq
 
