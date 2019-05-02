@@ -4,7 +4,7 @@ import Prelude
 
 import Data.Maybe (Maybe(..), maybe)
 import Effect (Effect)
-import HealthTrack.Model (ItemEntry(..), Item, ItemName(..))
+import HealthTrack.Model (ItemEntry(..), Item, ItemName(..), ItemNotes(..))
 import HealthTrack.Util as Util
 import HealthTrack.ModelUtil as MU
 import React.Basic (StateUpdate(..), JSX, make, runUpdate, Component, createComponent, Self)
@@ -16,6 +16,7 @@ import Data.List as List
 import Data.List (List)
 import Data.Array as Array
 import HealthTrack.AutoComplete as AC
+import HealthTrack.CommonViews as CV
 
 comp :: Component Props
 comp = createComponent "AddFoodEntryScreen"
@@ -31,14 +32,14 @@ type Props =
   }
 
 type State =
-  { description :: Maybe String
-  , selectedText :: Maybe AC.Entry
+  { selectedText :: Maybe AC.Entry
+  , notes :: Maybe String
   }
 
 form :: Props -> JSX
 form props = make comp
   { render
-  , initialState: { description: Nothing, selectedText: Nothing }
+  , initialState: { selectedText: Nothing, notes: Nothing }
   } props
   where
     update :: Self Props State -> Action -> StateUpdate Props State
@@ -56,8 +57,10 @@ form props = make comp
               doSaveItem :: Self Props State -> Effect Unit
               doSaveItem self' = do
                 let
+                  nextName = ItemName $ maybe "" _.val self'.state.selectedText
+                  nextNotes = ItemNotes $ maybe "" identity self'.state.notes
                   nextEntry =
-                    FoodItem $ ItemName $ maybe "" _.val self'.state.selectedText
+                    FoodItem nextName nextNotes
                 self'.props.onEntryComplete nextEntry
 
     send = runUpdate update
@@ -66,31 +69,34 @@ form props = make comp
       let
         renderItem {item} = text { children : [ string "string" ] }
 
-        descriptionAutoComplete =
+        nameAutoComplete =
           AC.autoComplete { onItemSelected: itemSelected
-                          , key: "descriptionAutoComplete"
+                          , key: "nameAutoComplete"
                           , initialEntries: allFoodSuggestions
                           , addCreateEntry: true
                           , handler: inputChangeHandler allFoodSuggestions
                           }
 
         autoCompWrapped =
-          view { key: "DescriptionWrapper"
+          view { key: "NameWrapper"
                , style: css { height: "100%"
                             , width: "100%"
                             }
-               , children: [ descriptionAutoComplete ]
+               , children: [ nameAutoComplete ]
                }
 
         allFoodSuggestions = foodSuggestions self.props.items
 
-        foodTypeText {val}=
+        foodTypeText {val} =
           text { key: "food label"
                , children: [ string $ val]
                }
 
         itemSelected entry =
           send self $ TextSelected entry
+
+        setNote tv =
+          self.setState _ { notes = tv }
 
       in
        view { style: css { flexDirection: "column"
@@ -104,6 +110,9 @@ form props = make comp
                      , children: [ string "Food type:" ]
                      }
               , maybe autoCompWrapped foodTypeText self.state.selectedText
+
+              , CV.notesInput self.state.notes setNote (send self SaveItem )
+
               , button { title: "save"
                        , key: "clickyButton"
                        , onPress: (capture_ $ send self SaveItem )
@@ -140,8 +149,8 @@ foodSuggestions items =
     getItemNameStr =
       case _ of
         ItemName name -> name
-    -- pull names from item entries for suggestions
 
+    -- pull names from item entries for suggestions
     suggestions =
        items <#>
       _.entry #

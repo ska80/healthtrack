@@ -9,7 +9,7 @@ import Effect.Class (liftEffect)
 import Effect.Console (log)
 import Effect.Aff.Compat (EffectFnAff, fromEffectFnAff)
 import Foreign (Foreign, MultipleErrors, fail, ForeignError(..), unsafeToForeign)
-import HealthTrack.Model (AppState, Screen(..), Item, CreatedAtInst(..), ItemEntry(..), ItemName(..))
+import HealthTrack.Model (AppState, Screen(..), Item, CreatedAtInst(..), ItemEntry(..), ItemName(..), ItemNotes(..))
 import Data.DateTime.Instant (instant)
 import Data.Time.Duration (Milliseconds(..))
 import Data.Traversable (traverse)
@@ -58,46 +58,46 @@ serializeAppState state =
   in
    unsafeStringify serialized
 
-type SerializedItem =
-  { createdAt :: CreatedAtInst -- will stringify ok
-  , key :: String
-  , entry :: { _type :: String
-             , desc :: Foreign
-             }
-  }
-
 -- TODO this is very much garbage, i need to figure out how to do this better
 -- I remember there being a thing in simple json about how to handle sum types w/ data
-serializeItem :: Item -> SerializedItem
+serializeItem :: Item -> Foreign
 serializeItem item =
   let
+    serializeItemEntry :: ItemEntry -> Foreign
     serializeItemEntry ie =
       case ie of
-        FoodItem text ->
-          { _type: "FoodItem"
-          , desc: unsafeToForeign text
-          }
+        FoodItem (ItemName name') (ItemNotes notes')->
+          unsafeToForeign
+            { _type: "FoodItem"
+            , desc: name'
+            , notes: notes'
+            }
         ConditionItem text ->
-          { _type: "ConditionItem"
-          , desc: unsafeToForeign text
-          }
+          unsafeToForeign
+            { _type: "ConditionItem"
+            , desc: unsafeToForeign text
+            }
         SymptomItem text ->
-          { _type: "SymptomItem"
-          , desc: unsafeToForeign text
-          }
+          unsafeToForeign
+            { _type: "SymptomItem"
+            , desc: unsafeToForeign text
+            }
         ActivityItem text ->
-          { _type: "ActivityItem"
-          , desc: unsafeToForeign text
-          }
+          unsafeToForeign
+            { _type: "ActivityItem"
+            , desc: unsafeToForeign text
+            }
         NoteItem text ->
-          { _type: "NoteItem"
-          , desc: unsafeToForeign text
-          }
+          unsafeToForeign
+            { _type: "NoteItem"
+            , desc: unsafeToForeign text
+            }
   in
-   { createdAt:  item.createdAt
-   , key: item.key
-   , entry: serializeItemEntry item.entry
-   }
+   unsafeToForeign
+     { createdAt:  item.createdAt
+     , key: item.key
+     , entry: serializeItemEntry item.entry
+     }
 
 -- TODO def need to add some kind of tests for serialization/deserialization
 -- might also be a good case for some kind of quickcheck like thing
@@ -176,8 +176,10 @@ readItemSimple ctor itemEntryF = do
   pure $ ctor txt
 
 readFoodItem :: F.Foreign -> F.F ItemEntry
--- readFoodItem = readItemSimple FoodItem
-readFoodItem = readItemSimple $ FoodItem <<< ItemName
+readFoodItem itemEntryF = do
+  txt <- (FI.readProp "desc" >=> F.readString) itemEntryF
+  notes <- (FI.readProp "notes" >=> F.readString) itemEntryF
+  pure $ FoodItem (ItemName txt) (ItemNotes notes)
 
 readConditionItem :: F.Foreign -> F.F ItemEntry
 readConditionItem = readItemSimple ConditionItem

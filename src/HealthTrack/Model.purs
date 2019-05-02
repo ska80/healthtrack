@@ -46,9 +46,20 @@ instance itemNameShow :: Show ItemName where
 instance itemNameDebug :: D.Debug ItemName where
   debug = D.genericDebug
 
+
+newtype ItemNotes = ItemNotes String
+
+derive instance genericItemNotes :: Generic ItemNotes _
+
+instance itemNotesShow :: Show ItemNotes where
+  show = genericShow
+
+instance itemNotesDebug :: D.Debug ItemNotes where
+  debug = D.genericDebug
+
 data ItemEntry
   -- = FoodItem String
-  = FoodItem ItemName
+  = FoodItem ItemName ItemNotes
     -- food, water, etc
   | ConditionItem String
     -- stress, sickness, etc

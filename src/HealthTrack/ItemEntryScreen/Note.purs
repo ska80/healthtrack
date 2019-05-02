@@ -7,10 +7,10 @@ import Effect (Effect)
 import HealthTrack.Model (ItemEntry(..))
 import React.Basic (StateUpdate(..), JSX, make, runUpdate, Component, createComponent, Self)
 import React.Basic.DOM (css)
-import React.Basic.DOM.Events (capture_, capture)
-import React.Basic.Native (text, string, button, view, textInput)
+import React.Basic.DOM.Events (capture_)
+import React.Basic.Native (text, string, button, view)
 import Effect.Now (now)
-import HealthTrack.Util as Util
+import HealthTrack.CommonViews as CV
 
 comp :: Component Props
 comp = createComponent "AddNoteEntryScreen"
@@ -50,31 +50,17 @@ form props = make comp
     send = runUpdate update
 
     render self =
-      view { style: css { flexDirection: "column", padding: 50
-                        , width: "100%", height: 400
+      view { style: css { flexDirection: "column"
+                        , padding: 50
+                        , width: "100%"
+                        , height: 400
                         }
            , key: self.props.key
            , children:
              [ text { key: "instructions"
                     , children: [ string "Note:" ]
                     }
-             , textInput { key: "txtinput"
-                         , placeholder: "Enter note text here"
-                         , style: css { flex: 1
-                                      , borderWidth: 1
-                                      , borderColor: "black"
-                                      , padding: 5
-                                      , width: "100%"
-                                      }
-                         , onChange: (capture Util.getText setStateText)
-                         , value: maybe "" identity self.state.textVal
-                         , onSubmitEditing: (capture_ $ send self AddItem )
-                           -- TODO maybe reenable autocorrect? seems like there
-                           -- should be a better way to fix the weird way the
-                           -- app was re-populating the field. idk.
-                         , autoCorrect: false
-                         , multiline: true
-                         }
+             , CV.notesInput self.state.textVal setStateText (send self AddItem)
              , button { title: "save"
                       , key: "clickyButton"
                       , onPress: (capture_ $ send self AddItem )

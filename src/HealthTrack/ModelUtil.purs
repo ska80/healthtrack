@@ -37,7 +37,7 @@ removeItem appState item =
 foodItemEntryDescription :: ItemEntry -> Maybe ItemName
 foodItemEntryDescription =
   case _ of
-    FoodItem s -> Just s
+    FoodItem name n -> Just name
     _ -> Nothing
 
 foodItemEntryDescriptions :: Array ItemEntry -> Array ItemName
