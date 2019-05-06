@@ -54,6 +54,7 @@ styles = { instructions: css { alignSelf: "center"
 -- TODO make all the screens that should go "back" to the prev screen go to the "choose"
 -- screen do it
 
+initialScreen :: AddEntryScreenType
 -- initialScreen = NoteEntryType
 initialScreen = ChooseNewEntryType
 

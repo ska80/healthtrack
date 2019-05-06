@@ -7,7 +7,7 @@ import Prelude
 
 import Data.Array (fromFoldable)
 import Effect (Effect)
-import HealthTrack.CommonViews as CV
+import HealthTrack.CommonViews (wButton, headerRowView)
 import HealthTrack.Model (AppState, Screen(..), Item, ItemName(..), CreatedAtInst(..), ItemEntry(..), ItemNotes(..))
 import HealthTrack.ModelUtil as MU
 import HealthTrack.TimeUtil as TimeUtil
@@ -59,22 +59,34 @@ viewLogScreen props = make comp
            UpdateAndSideEffects newState doDelete
 
     send = runUpdate update
-
     render self =
-      view { style: css {flexDirection: "column", paddingTop: 90, padding: 50, width: "100%" }
-           , children:
-             [ CV.returnToMenuButton self.props
-             , button { title: "Add New Entry"
-                      , key: "AddItemScreenButton"
-                      , onPress: capture_ (self.props.changeScreen AddItemScreen)
-                      }
-             , flatList { data: unsafeCoerce $ fromFoldable self.state.appState.items
-                        , key: "itemsList"
-                        , renderItem: toListRenderItem $ renderItem self send
-                        , "ItemSeparatorComponent": toFlatListPropsItemSeparatorComponent separator
-                        }
-             ]
-           }
+      let
+        header =
+          [ wButton { title: "< Menu"
+                    , key:  "MenuButton"
+                    , onPress: capture_ self.props.returnToMenuE
+                    }
+          , wButton { title: "+"
+                    , key:  "AddEntryButton"
+                    , onPress: capture_ (self.props.changeScreen AddItemScreen)
+                    }
+          , wButton { title: "Edit"
+                    , key:  "EditEntryButton"
+                      -- TODO add action for edit
+                    , onPress: capture_ (self.props.changeScreen AddItemScreen)
+                    }
+          ]
+
+        body =
+          [ flatList { data: unsafeCoerce $ fromFoldable self.state.appState.items
+                     , key: "itemsList"
+                     , renderItem: toListRenderItem $ renderItem self send
+                     , "ItemSeparatorComponent": toFlatListPropsItemSeparatorComponent separator
+                     }
+          ]
+      in
+       headerRowView header body
+
 
 toFlatListPropsItemSeparatorComponent :: ({ highlighted :: Boolean } -> JSX) -> FlatListPropsItemSeparatorComponent
 toFlatListPropsItemSeparatorComponent = unsafeCoerce
@@ -84,7 +96,6 @@ separator {highlighted} =
   view { style: css { borderWidth: 1, backgroundColor: "black", margin: 10 } }
 
 -- TODO add an "edit" button in here somehow
--- TODO add a delete button also
 renderItem :: Self Props State -> (Self Props State -> Action -> Effect Unit) -> { item :: Item } -> JSX
 renderItem self send {item} =
   let

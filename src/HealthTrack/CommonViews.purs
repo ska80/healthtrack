@@ -39,6 +39,31 @@ notesInput value onChange onSubmit =
             , multiline: true
             }
 
+
+headerRowView :: Array JSX -> Array JSX -> JSX
+headerRowView header body =
+  let
+    styles = { headerContWrap: css { flexDirection: "column"
+                                   , padding: 50
+                                   , width: "100%"
+                                   , height: "100%"
+                                   }
+             , headerWrap: css { flexDirection: "row"
+                               , justifyContent: "space-between"
+                               }
+             }
+  in
+   view { style: styles.headerContWrap
+        , key:  "HeaderRowView"
+        , children:
+          [ view { style: styles.headerWrap
+                 , key: "headerRowWrapper"
+                 , children: header
+                 }
+          , view { key: "wrapperView", children: body }
+          ]
+        }
+
 headerButtonsView ::
     { backButton ::
       { text :: String
@@ -52,34 +77,17 @@ headerButtonsView ::
     -> Array JSX -> JSX
 headerButtonsView props children =
   let
-    styles = { wrapper: css { flexDirection: "column"
-                            , padding: 50
-                            , width: "100%"
-                            , height: "100%"
-                            }
-             , headerButtonsWrap: css { flexDirection: "row"
-                                      , justifyContent: "space-between"
-                                      }
-             }
+    header = [ wButton { title: "< " <> props.backButton.text
+                       , key:  "backbutton"
+                       , onPress: props.backButton.action
+                       }
+             , wButton { title: props.optionButton.text
+                       , key:  "optionButton"
+                       , onPress: props.optionButton.action
+                       }
+             ]
   in
-   view { style: styles.wrapper
-        , key:  "HeaderButtonsView"
-        , children:
-          [ view { style: styles.headerButtonsWrap
-                 , key: "headerButtonWrapper"
-                 , children: [ wButton { title: "< " <> props.backButton.text
-                                       , key:  "backbutton"
-                                       , onPress: props.backButton.action
-                                       }
-                             , wButton { title: props.optionButton.text
-                                       , key:  "optionButton"
-                                       , onPress: props.optionButton.action
-                                       }
-                             ]
-                 }
-          , view { key: "wrapperView", children }
-          ]
-        }
+   headerRowView header children
 
 wButton :: { title :: String
            , key :: String
