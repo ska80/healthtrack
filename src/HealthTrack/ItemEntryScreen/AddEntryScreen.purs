@@ -3,7 +3,7 @@ module HealthTrack.ItemEntryScreen.AddEntryScreen where
 import Prelude
 
 import Effect (Effect)
-import Effect.Uncurried (EffectFn1)
+import HealthTrack.CommonViews (headerButtonsView, wButton)
 import HealthTrack.ItemEntryScreen.Food as IEFood
 import HealthTrack.ItemEntryScreen.Condition as IECondition
 import HealthTrack.ItemEntryScreen.Symptom as IESymptom
@@ -13,10 +13,9 @@ import HealthTrack.ItemEntryScreen.Note as IENote
 import HealthTrack.Model (AppState, ItemEntry, Screen(..))
 import HealthTrack.ModelUtil (addItemEntryToAppState)
 import React.Basic (StateUpdate(..), JSX, make, runUpdate, Component, createComponent, Self)
-import React.Basic.DOM (css, CSS)
+import React.Basic.DOM (css)
 import React.Basic.DOM.Events (capture_)
-import React.Basic.Events (SyntheticEvent)
-import React.Basic.Native (text, string, button, view)
+import React.Basic.Native (text, string)
 
 comp :: Component Props
 comp = createComponent "AddEntryScreen"
@@ -44,15 +43,25 @@ type AddEntryScreenState =
   , appState :: AppState
   }
 
+
+styles = { instructions: css { alignSelf: "center"
+                             , margin: 20
+                             , marginTop: 60
+                             }
+         }
+
+
 -- TODO make all the screens that should go "back" to the prev screen go to the "choose"
 -- screen do it
+
+-- initialScreen = NoteEntryType
+initialScreen = ChooseNewEntryType
 
 logEntryScreen :: Props -> JSX
 logEntryScreen props = make comp
   { render
   , initialState: { appState: props.state
-                  -- , currentScreen: NoteEntryType
-                  , currentScreen: ChooseNewEntryType
+                  , currentScreen: initialScreen
                   }
   } props
   where
@@ -83,26 +92,20 @@ logEntryScreen props = make comp
 
       where
         wrapperView children =
-          view { style: styles.wrapper
-               , key:  "WrapperView2"
-               , children:
-                 [ view { style: styles.headerButtonsWrap
-                        , key: "headerButtonWrapper"
-                        , children: [ wButton { title: "< Menu"
-                                              , key:  "MenuButton"
-                                              , onPress: capture_ props.returnToMenuE
-                                              , style: css {}
-                                              }
-                                    , wButton { title: "Existing Entries"
-                                              , key:  "ViewLogButton"
-                                              , onPress: capture_ (props.changeScreen ViewLogScreen)
-                                              , style: css {}
-                                              }
-                                    ]
-                        }
-                 , view { key: "wrapperView", children }
-                 ]
-               }
+          let
+            props' =
+              { backButton: { text: "Menu"
+                            , action: capture_ props.returnToMenuE
+                            }
+              , optionButton: { text: "Existing Entries"
+                              , action: capture_ (props.changeScreen ViewLogScreen)
+                              }
+              }
+          in
+           headerButtonsView props' children
+
+        selectEntryType et =
+          capture_ (send self $ SelectEntryType et)
 
         renderChooseNewEntryType _ignored =
           wrapperView children
@@ -114,28 +117,23 @@ logEntryScreen props = make comp
                      }
               , wButton { title: "Food"
                         , key: "foodbutton"
-                        , onPress: capture_ (send self $ SelectEntryType FoodEntryType)
-                        , style: styles.choiceButton
+                        , onPress: selectEntryType FoodEntryType
                         }
               , wButton { title: "Condition"
                         , key: "conditionbutton"
-                        , onPress: capture_ (send self $ SelectEntryType ConditionEntryType)
-                        , style: styles.choiceButton
+                        , onPress: selectEntryType ConditionEntryType
                         }
               , wButton { title: "Symptom"
                         , key: "symptombutton"
-                        , onPress: capture_ (send self $ SelectEntryType SymptomEntryType)
-                        , style: styles.choiceButton
+                        , onPress: selectEntryType SymptomEntryType
                         }
               , wButton { title: "Activity"
                         , key: "activitybutton"
-                        , onPress: capture_ (send self $ SelectEntryType ActivityEntryType)
-                        , style: styles.choiceButton
+                        , onPress: selectEntryType ActivityEntryType
                         }
               , wButton { title: "Note"
                         , key: "NoteButton"
-                        , onPress: capture_ (send self $ SelectEntryType NoteEntryType)
-                        , style: styles.choiceButton
+                        , onPress: selectEntryType NoteEntryType
                         }
               ]
 
@@ -144,18 +142,20 @@ logEntryScreen props = make comp
           where
             children =
               [ IEFood.form { key: "IEFoodElem"
-                               , onEntryComplete: onEntryComplete self
-                               , items: self.state.appState.items
-                               } ]
+                            , onEntryComplete: onEntryComplete self
+                            , items: self.state.appState.items
+                            }
+              ]
 
         renderConditionEntryType _ignored =
           wrapperView children
           where
             children =
               [ IECondition.form { key: "IEConditionElem"
-                               , onEntryComplete: onEntryComplete self
-                               , items: self.state.appState.items
-                               } ]
+                                 , onEntryComplete: onEntryComplete self
+                                 , items: self.state.appState.items
+                                 }
+              ]
 
         renderSymptomEntryType _ignored =
           wrapperView children
@@ -164,16 +164,18 @@ logEntryScreen props = make comp
               [ IESymptom.form { key: "IESymptomElem"
                                , onEntryComplete: onEntryComplete self
                                , items: self.state.appState.items
-                               } ]
+                               }
+              ]
 
         renderActivityEntryType _ignored =
           wrapperView children
           where
             children =
               [ IEActivity.form { key: "IEActivityElem"
-                               , onEntryComplete: onEntryComplete self
-                               , items: self.state.appState.items
-                               } ]
+                                , onEntryComplete: onEntryComplete self
+                                , items: self.state.appState.items
+                                }
+              ]
 
         renderNoteEntryType _ignored =
           wrapperView children
@@ -182,30 +184,4 @@ logEntryScreen props = make comp
               [ IENote.form { key: "IENoteElem"
                             , onEntryComplete: onEntryComplete self
                             }
-]
-
-    styles = { wrapper: css { flexDirection: "column"
-                            , padding: 50
-                            , width: "100%"
-                            , height: "100%"
-                            }
-             , instructions: css { alignSelf: "center"
-                                 , margin: 20
-                                 , marginTop: 60
-                                 }
-             , choiceButton: css { margin: 20 }
-             , headerButtonsWrap: css { flexDirection: "row"
-                                      , justifyContent: "space-between"
-                                      }
-             }
-
-wButton :: { title :: String, key :: String, onPress :: EffectFn1 SyntheticEvent Unit, style :: CSS } -> JSX
-wButton props =
-  view { key: props.key
-       , style: props.style
-       , children: [ button { title: props.title
-                            , key: props.key
-                            , onPress: props.onPress
-                            }
-                   ]
-       }
+              ]
