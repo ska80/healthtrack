@@ -14,15 +14,16 @@ import HealthTrack.TimeUtil as TimeUtil
 import React.Basic (JSX, Component, StateUpdate(..), make, runUpdate, createComponent, Self)
 import React.Basic.DOM (css)
 import React.Basic.DOM.Events (capture_)
-import React.Basic.Native (text, string, button, view, flatList,  FlatListPropsItemSeparatorComponent)
+import React.Basic.Native (text, string, button, view, flatList)
 import Unsafe.Coerce (unsafeCoerce)
-import HealthTrack.Util (toListRenderItem)
+import HealthTrack.Util (toListRenderItem, toFlatListPropsItemSeparatorComponent)
 
 comp :: Component Props
 comp = createComponent "ViewLogScreen"
 
 data Action
   = DeleteEntry Item
+  | ToggleEditing
 
 type Props =
   { returnToMenuE :: Effect Unit
@@ -32,12 +33,16 @@ type Props =
   }
 
 type State =
-  { appState :: AppState }
+  { appState :: AppState
+  , isEditing :: Boolean
+  }
 
 viewLogScreen :: Props -> JSX
 viewLogScreen props = make comp
    { render
-   , initialState: { appState: props.state }
+   , initialState: { appState: props.state
+                   , isEditing: false
+                   }
    }
    props
   where
@@ -58,6 +63,9 @@ viewLogScreen props = make comp
           in
            UpdateAndSideEffects newState doDelete
 
+        ToggleEditing ->
+          Update $ self.state { isEditing = not self.state.isEditing }
+
     send = runUpdate update
     render self =
       let
@@ -72,8 +80,7 @@ viewLogScreen props = make comp
                     }
           , wButton { title: "Edit"
                     , key:  "EditEntryButton"
-                      -- TODO add action for edit
-                    , onPress: capture_ (self.props.changeScreen AddItemScreen)
+                    , onPress: (capture_ $ send self $ ToggleEditing )
                     }
           ]
 
@@ -88,29 +95,26 @@ viewLogScreen props = make comp
        headerRowView header body
 
 
-toFlatListPropsItemSeparatorComponent :: ({ highlighted :: Boolean } -> JSX) -> FlatListPropsItemSeparatorComponent
-toFlatListPropsItemSeparatorComponent = unsafeCoerce
-
 separator :: ({ highlighted :: Boolean } -> JSX)
 separator {highlighted} =
   view { style: css { borderWidth: 1, backgroundColor: "black", margin: 10 } }
 
--- TODO add an "edit" button in here somehow
+-- TODO implement edit screens for each entry type
 renderItem :: Self Props State -> (Self Props State -> Action -> Effect Unit) -> { item :: Item } -> JSX
 renderItem self send {item} =
   let
     offset = self.state.appState.userTZOffset
     (CreatedAtInst utcInst) = item.createdAt
     createdAtFormatted = TimeUtil.utcInstDisplayLocal offset utcInst
+    deleteButton = button { title: "delete"
+                          , key: "DeleteButton"
+                          , onPress: (capture_ $ send self $ DeleteEntry item)
+                          }
     viewChildren =
       [ dispEntryItem item.entry
       , text { key:"createdAt"
              , children: [ string createdAtFormatted ] }
-      , button { title: "delete"
-               , key: "DeleteButton"
-               , onPress: (capture_ $ send self $ DeleteEntry item)
-               }
-      ]
+      ] <> if self.state.isEditing then [deleteButton] else []
   in
    view { style: css { flex: 1, flexDirection: "column" }
         , key: item.key
