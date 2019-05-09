@@ -110,14 +110,15 @@ loadAndInitializeAppState = do
   tzOffset <- liftEffect $ getTZOffset
   val <- retrieveValue appStateKey
   let
+    currentScreen =  MenuScreen
+    -- currentScreen = AddItemScreen
+
     makeThing :: { items :: Array Item
                  , nextId :: Int } -> AppState
     makeThing parsed =
       { nextId : parsed.nextId
       , items: parsed.items
-        -- TODO restore to menu screen
-      , currentScreen : MenuScreen
-      -- , currentScreen : AddItemScreen
+      , currentScreen : currentScreen
       , userTZOffset : tzOffset
       }
   pure $ (makeThing <$> parseSavedState val)
