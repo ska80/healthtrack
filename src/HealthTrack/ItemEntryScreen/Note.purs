@@ -21,6 +21,7 @@ data Action
 type Props =
   { onEntryComplete :: ItemEntry -> Effect Unit
   , key :: String
+  , item :: Maybe Item
   }
 
 type NoteEntryScreenState =

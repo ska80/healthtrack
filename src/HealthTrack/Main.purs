@@ -3,6 +3,7 @@ module HealthTrack.Main where
 import Prelude
 
 import Data.Either (Either(..))
+import Data.Maybe (Maybe(..))
 import Effect (Effect)
 import Effect.Aff (Aff, launchAff)
 import Effect.Class (liftEffect)
@@ -86,7 +87,16 @@ main = make comp
                                         , returnToMenuE: changeScreen self MenuScreen
                                         , changeScreen: changeScreen self
                                         , onStateUpdate
+                                        , item: Nothing
                                         }
+        EditItemScreen item ->
+          AddEntryScreen.logEntryScreen { state: self.state
+                                        , returnToMenuE: changeScreen self MenuScreen
+                                        , changeScreen: changeScreen self
+                                        , onStateUpdate
+                                        , item: Just item
+                                        }
+
         ViewLogScreen ->
           ViewLogScreen.viewLogScreen
             { returnToMenuE: changeScreen self MenuScreen

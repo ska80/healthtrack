@@ -91,6 +91,7 @@ instance debugCreatedAtInst :: D.Debug CreatedAtInst where
 data Screen
   = MenuScreen
   | AddItemScreen
+  | EditItemScreen Item
   | DeveloperScreen
   | ViewLogScreen
 

@@ -28,12 +28,16 @@ type Props =
   { onEntryComplete :: ItemEntry -> Effect Unit
   , key :: String
   , items :: Array Item
+  , item :: Maybe Item
   }
 
 type State =
   { description :: Maybe String
   , selectedText :: Maybe AC.Entry
   }
+
+
+initialState
 
 form :: Props -> JSX
 form props = make comp
@@ -46,7 +50,7 @@ form props = make comp
       case _ of
         TextSelected entry ->
           let
-            nextState = self.state { selectedText = Just entry}
+            nextState = self.state { selectedText = Just entry }
           in
            Update nextState
 

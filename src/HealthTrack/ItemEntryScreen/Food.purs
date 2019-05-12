@@ -29,6 +29,7 @@ type Props =
   { onEntryComplete :: ItemEntry -> Effect Unit
   , key :: String
   , items :: Array Item
+  , item :: Maybe Item
   }
 
 type State =

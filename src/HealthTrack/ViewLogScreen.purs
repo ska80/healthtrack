@@ -24,6 +24,7 @@ comp = createComponent "ViewLogScreen"
 data Action
   = DeleteEntry Item
   | ToggleEditing
+  | EditEntry Item
 
 type Props =
   { returnToMenuE :: Effect Unit
@@ -64,6 +65,9 @@ viewLogScreen props = make comp
            UpdateAndSideEffects newState doDelete
 
         ToggleEditing ->
+          Update $ self.state { isEditing = not self.state.isEditing }
+
+        EditEntry item ->
           Update $ self.state { isEditing = not self.state.isEditing }
 
     send = runUpdate update
@@ -110,11 +114,15 @@ renderItem self send {item} =
                           , key: "DeleteButton"
                           , onPress: (capture_ $ send self $ DeleteEntry item)
                           }
+    editEntryButton = button { title: "edit"
+                             , key: "editButton"
+                             , onPress: (capture_ $ send self $ EditEntry item)
+                             }
     viewChildren =
       [ dispEntryItem item.entry
       , text { key:"createdAt"
              , children: [ string createdAtFormatted ] }
-      ] <> if self.state.isEditing then [deleteButton] else []
+      ] <> if self.state.isEditing then [ editEntryButton, deleteButton ] else []
   in
    view { style: css { flex: 1, flexDirection: "column" }
         , key: item.key
