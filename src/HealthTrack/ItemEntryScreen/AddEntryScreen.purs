@@ -11,10 +11,11 @@ import HealthTrack.ItemEntryScreen.Symptom as IESymptom
 import HealthTrack.ItemEntryScreen.Activity as IEActivity
 import HealthTrack.ItemEntryScreen.Note as IENote
 
-import HealthTrack.Model (AppState, ItemEntry(..), Screen(..), Item(..))
-import HealthTrack.ModelUtil (addItemEntryToAppState)
+import HealthTrack.Model (AppState, ItemEntry(..), Screen(..), Item)
+import HealthTrack.ModelUtil (addItemEntryToAppState, updateItemEntryInAppState)
 import React.Basic (StateUpdate(..), JSX, make, runUpdate, Component, createComponent, Self)
-import React.Basic.DOM (css)
+import React.Basic.DOM (CSS, css)
+
 import React.Basic.DOM.Events (capture_)
 import React.Basic.Native (text, string)
 
@@ -45,6 +46,7 @@ type AddEntryScreenState =
   , appState :: AppState
   }
 
+styles :: { instructions :: CSS }
 styles = { instructions: css { alignSelf: "center"
                              , margin: 20
                              , marginTop: 60
@@ -97,6 +99,14 @@ logEntryScreen props = make comp
       self'.setState $ _ { appState = nextState }
       props.onStateUpdate nextState
       props.changeScreen ViewLogScreen
+
+    onEntryUpdate :: Self Props AddEntryScreenState -> Item -> ItemEntry -> Effect Unit
+    onEntryUpdate {state, setState} item itemEntry = do
+      nextState <- updateItemEntryInAppState state.appState item itemEntry
+      setState $ _ { appState = nextState }
+      props.onStateUpdate nextState
+      props.changeScreen ViewLogScreen
+
 
     render self =
       let
@@ -196,6 +206,7 @@ logEntryScreen props = make comp
             children =
               [ IEActivity.form { key: "IEActivityElem"
                                 , onEntryComplete: onEntryComplete self
+                                , onEntryUpdate: onEntryUpdate self
                                 , items: self.state.appState.items
                                 , item
                                 }

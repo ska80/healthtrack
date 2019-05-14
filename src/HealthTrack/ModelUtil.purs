@@ -9,7 +9,7 @@ import HealthTrack.Model (AppState, Item, ItemEntry(..), CreatedAtInst(..), Item
 import HealthTrack.Time (UTCInst(..))
 import Data.Array as Array
 import Data.Maybe (Maybe(..))
-
+import HealthTrack.Util (bool)
 
 makeItem :: Int -> ItemEntry -> Effect Item
 makeItem id itemEntry = do
@@ -25,6 +25,13 @@ addItemEntryToAppState appState itemEntry = do
   pure $ appState { items = newItem : appState.items
                   , nextId = appState.nextId + 1
                   }
+
+updateItemEntryInAppState :: AppState -> Item -> ItemEntry -> Effect AppState
+updateItemEntryInAppState appState item itemEntry = do
+  let newItem = item { entry = itemEntry }
+  let replaceOldWithNew oItem =
+        bool oItem newItem (oItem.key == newItem.key)
+  pure appState { items = replaceOldWithNew <$> appState.items }
 
 removeItem :: AppState -> Item -> AppState
 removeItem appState item =
@@ -64,8 +71,6 @@ symptomItemEntryDescriptions :: Array ItemEntry -> Array String
 symptomItemEntryDescriptions =
   Array.mapMaybe symptomItemEntryDescription
 
-
-
 activityItemEntryDescription :: ItemEntry -> Maybe String
 activityItemEntryDescription =
   case _ of
@@ -75,3 +80,14 @@ activityItemEntryDescription =
 activityItemEntryDescriptions :: Array ItemEntry -> Array String
 activityItemEntryDescriptions =
   Array.mapMaybe activityItemEntryDescription
+
+
+-- TODO change all items but FooDItem to use ItemName (not NoteItem, should use ItemNote)
+-- TODO convert ItemEntry to having data in record, hence have each itemData be its own separate type, can pass just the specific ItemEntry in that case
+itemEntryName :: ItemEntry -> Maybe String
+itemEntryName = case _ of
+  FoodItem (ItemName name) _ -> Just name
+  ConditionItem name       -> Just name
+  SymptomItem name         -> Just name
+  ActivityItem name        -> Just name
+  NoteItem _               -> Nothing

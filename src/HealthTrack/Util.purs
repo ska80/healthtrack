@@ -4,7 +4,6 @@ module HealthTrack.Util where
 
 import Prelude
 
-
 import Data.Array as Array
 import Data.Maybe (Maybe)
 import Data.Nullable (toMaybe)
@@ -38,3 +37,9 @@ stringHasContent s = Str.length s > 0
 
 filterEmptyStrings :: Array String -> Array String
 filterEmptyStrings = Array.filter stringHasContent
+
+undefined :: forall a. a
+undefined = unsafeCoerce unit
+
+bool :: forall a. a -> a -> Boolean -> a
+bool a b c = if c then b else a

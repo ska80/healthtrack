@@ -7,14 +7,12 @@ import Effect (Effect)
 import React.Basic (StateUpdate(..), JSX, make, runUpdate, Component, createComponent, Self)
 import React.Basic.DOM (css)
 import React.Basic.DOM.Events (capture_, capture)
-import React.Basic.Native (text, string, button, view, keyboardAvoidingView, textInput, flatList, KeyboardAvoidingViewPropsBehavior)
-import Effect.Now (now)
+import React.Basic.Native (button, flatList, textInput, view)
 import HealthTrack.Util as Util
 import Unsafe.Coerce (unsafeCoerce)
-import Data.List (List(..), (:), take)
+import Data.List (List, (:))
 import Data.List as List
 import HealthTrack.Util (toListRenderItem)
-import Debug.Trace (spy)
 import Data.Array as Array
 
 type Props =
@@ -71,14 +69,14 @@ autoComplete props = make comp
              entriesE = self.props.handler mtext self.state.entries self.state.nextId
              state' = self.state { textVal = mtext }
            in
-            UpdateAndSideEffects state' \self -> do
+            UpdateAndSideEffects state' \self' -> do
               (Response entries nextId) <- entriesE
-              self.setState $ \s-> s { entries = entries
-                                     , nextId = nextId
-                                     }
+              self'.setState $ \s-> s { entries = entries
+                                      , nextId = nextId
+                                      }
 
          EntryPress entry ->
-           SideEffects \self -> self.props.onItemSelected entry
+           SideEffects \self' -> self'.props.onItemSelected entry
 
          AddItem ->
            let
@@ -88,7 +86,7 @@ autoComplete props = make comp
              newEntry = { key: show self.state.nextId, val: itemText, displayText: itemText }
              newState = self.state { nextId = nextId' }
 
-             sendComplete self = self.props.onItemSelected newEntry
+             sendComplete self' = self'.props.onItemSelected newEntry
            in
             UpdateAndSideEffects newState sendComplete
 

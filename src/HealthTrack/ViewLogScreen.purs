@@ -68,7 +68,7 @@ viewLogScreen props = make comp
           Update $ self.state { isEditing = not self.state.isEditing }
 
         EditEntry item ->
-          Update $ self.state { isEditing = not self.state.isEditing }
+          SideEffects $ const (self.props.changeScreen $ EditItemScreen item)
 
     send = runUpdate update
     render self =

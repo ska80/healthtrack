@@ -104,8 +104,9 @@ instance debugScreen :: D.Debug Screen where
   debug = D.genericDebug
 
 initialState :: AppState
-initialState = { nextId: 0
-               , items: []
-               , currentScreen : MenuScreen
-               , userTZOffset : TZOffset (Minutes 0.0)
-               }
+initialState =
+  { nextId: 0
+  , items: []
+  , currentScreen : MenuScreen
+  , userTZOffset : TZOffset (Minutes 0.0)
+  }

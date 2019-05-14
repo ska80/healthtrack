@@ -26,6 +26,7 @@ data Action
 
 type Props =
   { onEntryComplete :: ItemEntry -> Effect Unit
+  , onEntryUpdate :: Item -> ItemEntry -> Effect Unit
   , key :: String
   , items :: Array Item
   , item :: Maybe Item
@@ -33,16 +34,32 @@ type Props =
 
 type State =
   { description :: Maybe String
-  , selectedText :: Maybe AC.Entry
+  , autocompEntry :: Maybe AC.Entry
   }
 
+initialState :: Props -> State
+initialState props =
+  let
+    maybeItemEntry = _.entry <$> props.item
+    description = maybeItemEntry >>= MU.itemEntryName
+  in
+   { description, autocompEntry: Nothing }
 
-initialState
+-- newOrEdit ::
+--   (ItemEntry -> Event Unit) ->
+--   (ItemEntry -> Item -> Event Unit) ->
+--   Props ->
+--   ItemEntry ->
+--   Event Unit
+-- newOrEdit fNew fEdit props itemEntry =
+--   case props.item of
+--     Just item ->
+--       fEdit item.entry item
 
 form :: Props -> JSX
 form props = make comp
   { render
-  , initialState: { description: Nothing, selectedText: Nothing }
+  , initialState: initialState props
   } props
   where
     update :: Self Props State -> Action -> StateUpdate Props State
@@ -50,7 +67,7 @@ form props = make comp
       case _ of
         TextSelected entry ->
           let
-            nextState = self.state { selectedText = Just entry }
+            nextState = self.state { autocompEntry = Just entry }
           in
            Update nextState
 
@@ -61,8 +78,10 @@ form props = make comp
               doSaveItem self' = do
                 let
                   nextEntry =
-                    ActivityItem $ maybe "" _.val self'.state.selectedText
-                self'.props.onEntryComplete nextEntry
+                    ActivityItem $ maybe "" _.val self'.state.autocompEntry
+                maybe (self'.props.onEntryComplete nextEntry)
+                      (flip self'.props.onEntryUpdate $ nextEntry)
+                      self'.props.item
 
     send = runUpdate update
 
@@ -90,7 +109,7 @@ form props = make comp
 
         activityTypeText {val}=
           text { key: "activity label"
-               , children: [ string $ val]
+               , children: [ string $ val ]
                }
 
         itemSelected entry =
@@ -107,7 +126,7 @@ form props = make comp
               [ text { key: "instructions"
                      , children: [ string "Activity type:" ]
                      }
-              , maybe autoCompWrapped activityTypeText self.state.selectedText
+              , maybe autoCompWrapped activityTypeText self.state.autocompEntry
               , button { title: "save"
                        , key: "clickyButton"
                        , onPress: (capture_ $ send self SaveItem )
@@ -138,10 +157,10 @@ providedActivitys =
   , "meditation"
   ]
 
+ -- pull names from all existing item entries for suggestions
 activitySuggestions :: Array Item -> List AC.Entry
 activitySuggestions items =
   let
-    -- pull names from item entries for suggestions
     suggestions =
       items <#>
       _.entry #

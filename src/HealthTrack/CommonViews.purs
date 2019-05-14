@@ -7,7 +7,7 @@ import Effect (Effect)
 import Effect.Uncurried (EffectFn1)
 import HealthTrack.Util as Util
 import React.Basic (JSX)
-import React.Basic.DOM (css, CSS)
+import React.Basic.DOM (css)
 import React.Basic.DOM.Events (capture_, capture)
 import React.Basic.Events (SyntheticEvent)
 import React.Basic.Native (button, textInput, view)
