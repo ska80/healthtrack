@@ -68,8 +68,8 @@ type ConditionData =
   }
 
 type SymptomData =
-   { name :: ItemName
-   }
+  { name :: ItemName
+  }
 
 type ActivityData =
   { name :: ItemName
