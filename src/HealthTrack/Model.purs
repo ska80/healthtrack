@@ -63,11 +63,16 @@ type FoodData =
   , notes :: ItemNotes
   }
 
+type ConditionData =
+  { name :: ItemName
+  }
+
 data ItemEntry
   -- = FoodItem String
   = FoodItem FoodData
     -- food, water, etc
-  | ConditionItem String
+    -- TODO finish converting these to records
+  | ConditionItem ConditionData
     -- stress, sickness, etc
   | SymptomItem String
     -- pain, etc

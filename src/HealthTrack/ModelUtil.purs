@@ -5,7 +5,7 @@ import Prelude
 import Data.Array ((:))
 import Effect (Effect)
 import Effect.Now (now)
-import HealthTrack.Model (AppState, Item(..), ItemEntry(..), CreatedAtInst(..), ItemName(..))
+import HealthTrack.Model (AppState, Item, ItemEntry(..), CreatedAtInst(..), ItemName(..))
 import HealthTrack.Time (UTCInst(..))
 import Data.Array as Array
 import Data.Maybe (Maybe(..))
@@ -51,10 +51,11 @@ foodItemEntryDescriptions :: Array ItemEntry -> Array ItemName
 foodItemEntryDescriptions =
   Array.mapMaybe foodItemEntryDescription
 
+-- TODO refactor this(these) to return Maybe ItemName
 conditionItemEntryDescription :: ItemEntry -> Maybe String
 conditionItemEntryDescription =
   case _ of
-    ConditionItem s -> Just s
+    ConditionItem { name: ItemName name } -> Just name
     _ -> Nothing
 
 conditionItemEntryDescriptions :: Array ItemEntry -> Array String
@@ -87,7 +88,7 @@ activityItemEntryDescriptions =
 itemEntryName :: ItemEntry -> Maybe String
 itemEntryName = case _ of
   FoodItem { name: ItemName name } -> Just name
-  ConditionItem name       -> Just name
+  ConditionItem { name: ItemName name } -> Just name
   SymptomItem name         -> Just name
   ActivityItem name        -> Just name
   NoteItem _               -> Nothing

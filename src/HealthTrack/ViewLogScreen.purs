@@ -142,8 +142,8 @@ dispEntryItem val =
                               }
                        ]
            }
-    ConditionItem theVal ->
-      text { key: "val", children: [ string $ "Condition: " <> theVal ] }
+    ConditionItem { name: ItemName name } ->
+      text { key: "val", children: [ string $ "Condition: " <> name ] }
     SymptomItem theVal ->
       text { key: "val", children: [ string $ "Symptom: " <> theVal ] }
     ActivityItem theVal ->

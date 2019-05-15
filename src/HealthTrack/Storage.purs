@@ -183,7 +183,7 @@ readFoodItem itemEntryF = do
   pure $ FoodItem { name: ItemName txt, notes: ItemNotes notes }
 
 readConditionItem :: F.Foreign -> F.F ItemEntry
-readConditionItem = readItemSimple ConditionItem
+readConditionItem = readItemSimple (\s -> ConditionItem { name: ItemName s })
 
 readSymptomItem :: F.Foreign -> F.F ItemEntry
 readSymptomItem = readItemSimple SymptomItem
