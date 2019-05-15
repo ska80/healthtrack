@@ -72,15 +72,15 @@ serializeItem item =
             , desc: name'
             , notes: notes'
             }
-        ConditionItem text ->
+        ConditionItem { name: ItemName name' } ->
           unsafeToForeign
             { _type: "ConditionItem"
-            , desc: unsafeToForeign text
+            , desc: name'
             }
-        SymptomItem text ->
+        SymptomItem { name: ItemName name' } ->
           unsafeToForeign
             { _type: "SymptomItem"
-            , desc: unsafeToForeign text
+            , desc: name'
             }
         ActivityItem text ->
           unsafeToForeign
