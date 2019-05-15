@@ -8,7 +8,7 @@ import Prelude
 import Data.Array (fromFoldable)
 import Effect (Effect)
 import HealthTrack.CommonViews (wButton, headerRowView)
-import HealthTrack.Model (AppState, Screen(..), Item, ItemName(..), CreatedAtInst(..), ItemEntry(..), ItemNotes(..))
+import HealthTrack.Model (AppState, Screen(..), Item, ItemName(..), CreatedAtInst(..), ItemEntry(..), ItemNote(..))
 import HealthTrack.ModelUtil as MU
 import HealthTrack.TimeUtil as TimeUtil
 import React.Basic (JSX, Component, StateUpdate(..), make, runUpdate, createComponent, Self)
@@ -132,13 +132,13 @@ renderItem self send {item} =
 dispEntryItem :: ItemEntry -> JSX
 dispEntryItem val =
   case val of
-    FoodItem { name: ItemName name, notes: ItemNotes notes } ->
+    FoodItem { name: ItemName name, note: ItemNote notes } ->
       view { key: "foodItem"
            , children: [ text { key: "name"
                               , children: [ string $ "Food: " <> name ]
                               }
                        , text { key: "notes"
-                              , children: [ string $ "Notes: " <> notes ]
+                              , children: [ string $ "Note: " <> notes ]
                               }
                        ]
            }
@@ -148,5 +148,5 @@ dispEntryItem val =
       text { key: "val", children: [ string $ "Symptom: " <> name ] }
     ActivityItem { name: ItemName name } ->
       text { key: "val", children: [ string $ "Activity: " <> name ] }
-    NoteItem { notes: ItemNotes notes } ->
+    NoteItem { note: ItemNote notes } ->
       text { key: "val", children: [ string  $ "Note: " <> notes ] }

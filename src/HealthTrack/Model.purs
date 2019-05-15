@@ -47,20 +47,20 @@ instance itemNameDebug :: D.Debug ItemName where
   debug = D.genericDebug
 
 
-newtype ItemNotes = ItemNotes String
+newtype ItemNote = ItemNote String
 
-derive instance genericItemNotes :: Generic ItemNotes _
+derive instance genericItemNote :: Generic ItemNote _
 
-instance itemNotesShow :: Show ItemNotes where
+instance itemNotesShow :: Show ItemNote where
   show = genericShow
 
-instance itemNotesDebug :: D.Debug ItemNotes where
+instance itemNotesDebug :: D.Debug ItemNote where
   debug = D.genericDebug
 
 
 type FoodData =
   { name :: ItemName
-  , notes :: ItemNotes
+  , note :: ItemNote
   }
 
 type ConditionData =
@@ -76,7 +76,7 @@ type ActivityData =
   }
 
 type NoteData =
-  {  notes :: ItemNotes
+  { note :: ItemNote
   }
 
 data ItemEntry

@@ -9,7 +9,7 @@ import Effect.Class (liftEffect)
 import Effect.Console (log)
 import Effect.Aff.Compat (EffectFnAff, fromEffectFnAff)
 import Foreign (Foreign, MultipleErrors, fail, ForeignError(..), unsafeToForeign)
-import HealthTrack.Model (AppState, Screen(..), Item, CreatedAtInst(..), ItemEntry(..), ItemName(..), ItemNotes(..))
+import HealthTrack.Model (AppState, Screen(..), Item, CreatedAtInst(..), ItemEntry(..), ItemName(..), ItemNote(..))
 import Data.DateTime.Instant (instant)
 import Data.Time.Duration (Milliseconds(..))
 import Data.Traversable (traverse)
@@ -66,11 +66,11 @@ serializeItem item =
     serializeItemEntry :: ItemEntry -> Foreign
     serializeItemEntry ie =
       case ie of
-        FoodItem { name: ItemName name', notes: ItemNotes notes' } ->
+        FoodItem { name: ItemName name', note: ItemNote notes' } ->
           unsafeToForeign
             { _type: "FoodItem"
             , desc: name'
-            , notes: notes'
+            , note: notes'
             }
         ConditionItem { name: ItemName name' } ->
           unsafeToForeign
@@ -87,7 +87,7 @@ serializeItem item =
             { _type: "ActivityItem"
             , desc: name'
             }
-        NoteItem { notes: ItemNotes note' } ->
+        NoteItem { note: ItemNote note' } ->
           unsafeToForeign
             { _type: "NoteItem"
             , desc: unsafeToForeign note'
@@ -179,8 +179,8 @@ readItemSimple ctor itemEntryF = do
 readFoodItem :: F.Foreign -> F.F ItemEntry
 readFoodItem itemEntryF = do
   txt <- (FI.readProp "desc" >=> F.readString) itemEntryF
-  notes <- (FI.readProp "notes" >=> F.readString) itemEntryF
-  pure $ FoodItem { name: ItemName txt, notes: ItemNotes notes }
+  notes <- (FI.readProp "note" >=> F.readString) itemEntryF
+  pure $ FoodItem { name: ItemName txt, note: ItemNote notes }
 
 readConditionItem :: F.Foreign -> F.F ItemEntry
 readConditionItem = readItemSimple (\s -> ConditionItem { name: ItemName s })
@@ -192,4 +192,4 @@ readActivityItem :: F.Foreign -> F.F ItemEntry
 readActivityItem = readItemSimple (\s -> ActivityItem { name: ItemName s })
 
 readNoteItem :: F.Foreign -> F.F ItemEntry
-readNoteItem = readItemSimple (\s -> NoteItem { notes: ItemNotes s })
+readNoteItem = readItemSimple (\s -> NoteItem { note: ItemNote s })

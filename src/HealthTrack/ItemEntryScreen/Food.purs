@@ -4,7 +4,7 @@ import Prelude
 
 import Data.Maybe (Maybe(..), maybe)
 import Effect (Effect)
-import HealthTrack.Model (ItemEntry(..), Item, ItemName(..), ItemNotes(..))
+import HealthTrack.Model (ItemEntry(..), Item, ItemName(..), ItemNote(..))
 import HealthTrack.Util as Util
 import HealthTrack.ModelUtil as MU
 import React.Basic (StateUpdate(..), JSX, make, runUpdate, Component, createComponent, Self)
@@ -34,13 +34,13 @@ type Props =
 
 type State =
   { selectedText :: Maybe AC.Entry
-  , notes :: Maybe String
+  , note :: Maybe String
   }
 
 form :: Props -> JSX
 form props = make comp
   { render
-  , initialState: { selectedText: Nothing, notes: Nothing }
+  , initialState: { selectedText: Nothing, note: Nothing }
   } props
   where
     update :: Self Props State -> Action -> StateUpdate Props State
@@ -59,9 +59,9 @@ form props = make comp
               doSaveItem self' = do
                 let
                   nextName = ItemName $ maybe "" _.val self'.state.selectedText
-                  nextNotes = ItemNotes $ maybe "" identity self'.state.notes
+                  nextNotes = ItemNote $ maybe "" identity self'.state.note
                   nextEntry =
-                    FoodItem { name: nextName, notes: nextNotes }
+                    FoodItem { name: nextName, note: nextNotes }
                 self'.props.onEntryComplete nextEntry
 
     send = runUpdate update
@@ -97,7 +97,7 @@ form props = make comp
           send self $ TextSelected entry
 
         setNote tv =
-          self.setState _ { notes = tv }
+          self.setState _ { note = tv }
 
       in
        view { style: css { flexDirection: "column"
@@ -112,7 +112,7 @@ form props = make comp
                      }
               , maybe autoCompWrapped foodTypeText self.state.selectedText
 
-              , CV.notesInput self.state.notes setNote (send self SaveItem )
+              , CV.notesInput self.state.note setNote (send self SaveItem )
 
               , button { title: "save"
                        , key: "clickyButton"
