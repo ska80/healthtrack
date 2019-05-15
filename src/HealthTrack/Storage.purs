@@ -82,15 +82,15 @@ serializeItem item =
             { _type: "SymptomItem"
             , desc: name'
             }
-        ActivityItem text ->
+        ActivityItem { name: ItemName name' } ->
           unsafeToForeign
             { _type: "ActivityItem"
-            , desc: unsafeToForeign text
+            , desc: name'
             }
-        NoteItem text ->
+        NoteItem { notes: ItemNotes note' } ->
           unsafeToForeign
             { _type: "NoteItem"
-            , desc: unsafeToForeign text
+            , desc: unsafeToForeign note'
             }
   in
    unsafeToForeign
@@ -189,7 +189,7 @@ readSymptomItem :: F.Foreign -> F.F ItemEntry
 readSymptomItem = readItemSimple (\s -> SymptomItem { name: ItemName s })
 
 readActivityItem :: F.Foreign -> F.F ItemEntry
-readActivityItem = readItemSimple ActivityItem
+readActivityItem = readItemSimple (\s -> ActivityItem { name: ItemName s })
 
 readNoteItem :: F.Foreign -> F.F ItemEntry
-readNoteItem = readItemSimple NoteItem
+readNoteItem = readItemSimple (\s -> NoteItem { notes: ItemNotes s })

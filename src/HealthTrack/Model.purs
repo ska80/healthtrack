@@ -71,6 +71,14 @@ type SymptomData =
    { name :: ItemName
    }
 
+type ActivityData =
+  { name :: ItemName
+  }
+
+type NoteData =
+  {  notes :: ItemNotes
+  }
+
 data ItemEntry
   -- = FoodItem String
   = FoodItem FoodData
@@ -80,9 +88,9 @@ data ItemEntry
     -- stress, sickness, etc
   | SymptomItem SymptomData
     -- pain, etc
-  | ActivityItem String
+  | ActivityItem ActivityData
     -- exercise, walking, etc
-  | NoteItem String
+  | NoteItem NoteData
     -- uncategorized, free form note
 
 derive instance genericItemEntry :: Generic ItemEntry _

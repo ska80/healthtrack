@@ -4,7 +4,7 @@ import Prelude
 
 import Data.Maybe (Maybe(..), maybe)
 import Effect (Effect)
-import HealthTrack.Model (ItemEntry(..), Item)
+import HealthTrack.Model (ItemEntry(..), Item, ItemName(..))
 import HealthTrack.Util as Util
 import HealthTrack.ModelUtil as MU
 import React.Basic (StateUpdate(..), JSX, make, runUpdate, Component, createComponent, Self)
@@ -77,8 +77,9 @@ form props = make comp
               doSaveItem :: Self Props State -> Effect Unit
               doSaveItem self' = do
                 let
+                  name = maybe "" _.val self'.state.autocompEntry
                   nextEntry =
-                    ActivityItem $ maybe "" _.val self'.state.autocompEntry
+                    ActivityItem $ { name: ItemName name }
                 maybe (self'.props.onEntryComplete nextEntry)
                       (flip self'.props.onEntryUpdate $ nextEntry)
                       self'.props.item

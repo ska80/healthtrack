@@ -4,7 +4,7 @@ import Prelude
 
 import Data.Maybe (Maybe(..), maybe)
 import Effect (Effect)
-import HealthTrack.Model (ItemEntry(..), Item)
+import HealthTrack.Model (ItemEntry(..), Item, ItemNotes(..))
 import React.Basic (StateUpdate(..), JSX, make, runUpdate, Component, createComponent, Self)
 import React.Basic.DOM (css)
 import React.Basic.DOM.Events (capture_)
@@ -44,8 +44,9 @@ form props = make comp
               doAddItem self' = do
                 now' <- now
                 let
+                  notes = maybe "" identity self'.state.textVal
                   nextEntry =
-                    NoteItem $ maybe "" identity self'.state.textVal
+                    NoteItem {notes: ItemNotes notes}
                 self'.props.onEntryComplete nextEntry
 
     send = runUpdate update

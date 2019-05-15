@@ -75,7 +75,7 @@ symptomItemEntryDescriptions =
 activityItemEntryDescription :: ItemEntry -> Maybe String
 activityItemEntryDescription =
   case _ of
-    ActivityItem s -> Just s
+    ActivityItem { name: ItemName name } -> Just name
     _ -> Nothing
 
 activityItemEntryDescriptions :: Array ItemEntry -> Array String
@@ -89,6 +89,6 @@ itemEntryName :: ItemEntry -> Maybe String
 itemEntryName = case _ of
   FoodItem { name: ItemName name } -> Just name
   ConditionItem { name: ItemName name } -> Just name
-  SymptomItem  { name: ItemName name } -> Just name
-  ActivityItem name        -> Just name
+  SymptomItem { name: ItemName name } -> Just name
+  ActivityItem { name: ItemName name } -> Just name
   NoteItem _               -> Nothing
