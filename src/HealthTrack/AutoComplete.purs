@@ -81,9 +81,14 @@ autoComplete props = make comp
          AddItem ->
            let
              itemText = maybe "" identity self.state.textVal
+
              nextId' = self.state.nextId + 1
 
-             newEntry = { key: show self.state.nextId, val: itemText, displayText: itemText }
+             newEntry = { key: show self.state.nextId
+                        , val: itemText
+                        , displayText: itemText
+                        }
+
              newState = self.state { nextId = nextId' }
 
              sendComplete self' = self'.props.onItemSelected newEntry

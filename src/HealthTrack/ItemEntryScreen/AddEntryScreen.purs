@@ -72,7 +72,7 @@ getInitialState props =
 itemToScreen :: Item -> AddEntryScreenType
 itemToScreen item =
   case item.entry of
-    FoodItem _ _    -> FoodEntryType
+    FoodItem _      -> FoodEntryType
     ConditionItem _ -> ConditionEntryType
     SymptomItem _   -> SymptomEntryType
     ActivityItem _  -> ActivityEntryType
@@ -206,6 +206,7 @@ logEntryScreen props = make comp
             children =
               [ IEActivity.form { key: "IEActivityElem"
                                 , onEntryComplete: onEntryComplete self
+                                  -- TODO add updating for all the other types
                                 , onEntryUpdate: onEntryUpdate self
                                 , items: self.state.appState.items
                                 , item

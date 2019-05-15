@@ -66,7 +66,7 @@ serializeItem item =
     serializeItemEntry :: ItemEntry -> Foreign
     serializeItemEntry ie =
       case ie of
-        FoodItem (ItemName name') (ItemNotes notes')->
+        FoodItem { name: ItemName name', notes: ItemNotes notes' } ->
           unsafeToForeign
             { _type: "FoodItem"
             , desc: name'
@@ -180,7 +180,7 @@ readFoodItem :: F.Foreign -> F.F ItemEntry
 readFoodItem itemEntryF = do
   txt <- (FI.readProp "desc" >=> F.readString) itemEntryF
   notes <- (FI.readProp "notes" >=> F.readString) itemEntryF
-  pure $ FoodItem (ItemName txt) (ItemNotes notes)
+  pure $ FoodItem { name: ItemName txt, notes: ItemNotes notes }
 
 readConditionItem :: F.Foreign -> F.F ItemEntry
 readConditionItem = readItemSimple ConditionItem

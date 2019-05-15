@@ -57,9 +57,15 @@ instance itemNotesShow :: Show ItemNotes where
 instance itemNotesDebug :: D.Debug ItemNotes where
   debug = D.genericDebug
 
+
+type FoodData =
+  { name :: ItemName
+  , notes :: ItemNotes
+  }
+
 data ItemEntry
   -- = FoodItem String
-  = FoodItem ItemName ItemNotes
+  = FoodItem FoodData
     -- food, water, etc
   | ConditionItem String
     -- stress, sickness, etc

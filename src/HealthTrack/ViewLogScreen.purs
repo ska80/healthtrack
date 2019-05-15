@@ -132,7 +132,7 @@ renderItem self send {item} =
 dispEntryItem :: ItemEntry -> JSX
 dispEntryItem val =
   case val of
-    FoodItem (ItemName name) (ItemNotes notes) ->
+    FoodItem { name: ItemName name, notes: ItemNotes notes } ->
       view { key: "foodItem"
            , children: [ text { key: "name"
                               , children: [ string $ "Food: " <> name ]

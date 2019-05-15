@@ -61,7 +61,7 @@ form props = make comp
                   nextName = ItemName $ maybe "" _.val self'.state.selectedText
                   nextNotes = ItemNotes $ maybe "" identity self'.state.notes
                   nextEntry =
-                    FoodItem nextName nextNotes
+                    FoodItem { name: nextName, notes: nextNotes }
                 self'.props.onEntryComplete nextEntry
 
     send = runUpdate update

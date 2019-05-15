@@ -5,7 +5,7 @@ import Prelude
 import Data.Array ((:))
 import Effect (Effect)
 import Effect.Now (now)
-import HealthTrack.Model (AppState, Item, ItemEntry(..), CreatedAtInst(..), ItemName(..))
+import HealthTrack.Model (AppState, Item(..), ItemEntry(..), CreatedAtInst(..), ItemName(..))
 import HealthTrack.Time (UTCInst(..))
 import Data.Array as Array
 import Data.Maybe (Maybe(..))
@@ -44,7 +44,7 @@ removeItem appState item =
 foodItemEntryDescription :: ItemEntry -> Maybe ItemName
 foodItemEntryDescription =
   case _ of
-    FoodItem name n -> Just name
+    FoodItem { name } -> Just name
     _ -> Nothing
 
 foodItemEntryDescriptions :: Array ItemEntry -> Array ItemName
@@ -86,7 +86,7 @@ activityItemEntryDescriptions =
 -- TODO convert ItemEntry to having data in record, hence have each itemData be its own separate type, can pass just the specific ItemEntry in that case
 itemEntryName :: ItemEntry -> Maybe String
 itemEntryName = case _ of
-  FoodItem (ItemName name) _ -> Just name
+  FoodItem { name: ItemName name } -> Just name
   ConditionItem name       -> Just name
   SymptomItem name         -> Just name
   ActivityItem name        -> Just name
