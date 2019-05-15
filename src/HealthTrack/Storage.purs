@@ -186,7 +186,7 @@ readConditionItem :: F.Foreign -> F.F ItemEntry
 readConditionItem = readItemSimple (\s -> ConditionItem { name: ItemName s })
 
 readSymptomItem :: F.Foreign -> F.F ItemEntry
-readSymptomItem = readItemSimple SymptomItem
+readSymptomItem = readItemSimple (\s -> SymptomItem { name: ItemName s })
 
 readActivityItem :: F.Foreign -> F.F ItemEntry
 readActivityItem = readItemSimple ActivityItem

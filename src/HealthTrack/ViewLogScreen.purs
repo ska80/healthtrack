@@ -144,8 +144,8 @@ dispEntryItem val =
            }
     ConditionItem { name: ItemName name } ->
       text { key: "val", children: [ string $ "Condition: " <> name ] }
-    SymptomItem theVal ->
-      text { key: "val", children: [ string $ "Symptom: " <> theVal ] }
+    SymptomItem  { name: ItemName name } ->
+      text { key: "val", children: [ string $ "Symptom: " <> name ] }
     ActivityItem theVal ->
       text { key: "val", children: [ string $ "Activity: " <> theVal ] }
     NoteItem theVal ->

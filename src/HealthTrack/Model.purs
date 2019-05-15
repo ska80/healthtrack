@@ -67,6 +67,10 @@ type ConditionData =
   { name :: ItemName
   }
 
+type SymptomData =
+   { name :: ItemName
+   }
+
 data ItemEntry
   -- = FoodItem String
   = FoodItem FoodData
@@ -74,7 +78,7 @@ data ItemEntry
     -- TODO finish converting these to records
   | ConditionItem ConditionData
     -- stress, sickness, etc
-  | SymptomItem String
+  | SymptomItem SymptomData
     -- pain, etc
   | ActivityItem String
     -- exercise, walking, etc
