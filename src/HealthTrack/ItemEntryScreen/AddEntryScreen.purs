@@ -205,6 +205,7 @@ logEntryScreen props = make comp
           where
             children =
               [ IEActivity.form { key: "IEActivityElem"
+                                  -- TODO refactor `onEntryComplete` to signify it is new
                                 , onEntryComplete: onEntryComplete self
                                   -- TODO add updating for all the other types
                                 , onEntryUpdate: onEntryUpdate self

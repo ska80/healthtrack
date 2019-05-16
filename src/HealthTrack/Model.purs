@@ -16,9 +16,6 @@ type AppState =
   , userTZOffset :: TZOffset
   }
 
--- TODO convert state to be a made up of a list of changes (event source-y)
--- TODO add more data here: esp date added, date modified
-
 ppAppStateOpts :: { maxDepth :: Maybe Int
                   , compactThreshold :: Int
                   }
@@ -83,7 +80,6 @@ data ItemEntry
   -- = FoodItem String
   = FoodItem FoodData
     -- food, water, etc
-    -- TODO finish converting these to records
   | ConditionItem ConditionData
     -- stress, sickness, etc
   | SymptomItem SymptomData

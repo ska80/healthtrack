@@ -82,9 +82,6 @@ activityItemEntryDescriptions :: Array ItemEntry -> Array String
 activityItemEntryDescriptions =
   Array.mapMaybe activityItemEntryDescription
 
-
--- TODO change all items but FooDItem to use ItemName (not NoteItem, should use ItemNote)
--- TODO convert ItemEntry to having data in record, hence have each itemData be its own separate type, can pass just the specific ItemEntry in that case
 itemEntryName :: ItemEntry -> Maybe String
 itemEntryName = case _ of
   FoodItem { name: ItemName name } -> Just name
