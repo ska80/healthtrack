@@ -34,8 +34,7 @@ type Props =
   }
 
 type State =
-  { description :: Maybe String
-  , autocompEntry :: Maybe AC.Entry
+  { itemName :: Maybe AC.Entry
   , note :: Maybe String
   }
 
@@ -45,8 +44,7 @@ initialState props =
     maybeItemEntry = _.entry <$> props.item
     description = maybeItemEntry >>= MU.itemEntryName
   in
-   { description
-   , autocompEntry: Nothing
+   { itemName: Nothing
    , note: Nothing
    }
 
@@ -72,7 +70,7 @@ form props = make comp
       case _ of
         TextSelected entry ->
           let
-            nextState = self.state { autocompEntry = Just entry }
+            nextState = self.state { itemName = Just entry }
           in
            Update nextState
 
@@ -83,9 +81,9 @@ form props = make comp
               doSaveItem self' = do
                 let
                   -- TODO see if i can make common funcions to extract
-                  -- e.g. self.state.autocompentry into an itemnote
+                  -- e.g. self.state.itemName into an itemnote
                   -- and reuse everywhere
-                  nextName = ItemName $ maybe "" _.val self'.state.autocompEntry
+                  nextName = ItemName $ maybe "" _.val self'.state.itemName
                   nextNote = ItemNote $ maybe "" identity self'.state.note
                   nextEntry =
                     ActivityItem $ { name: nextName, note: nextNote }
@@ -140,7 +138,7 @@ form props = make comp
               [ text { key: "instructions"
                      , children: [ string "Activity type:" ]
                      }
-              , maybe autoCompWrapped activityTypeText self.state.autocompEntry
+              , maybe autoCompWrapped activityTypeText self.state.itemName
 
               , CV.notesInput self.state.note setNote doSave
 
