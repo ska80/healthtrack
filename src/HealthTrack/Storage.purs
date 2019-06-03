@@ -66,27 +66,42 @@ serializeItem item =
     serializeItemEntry :: ItemEntry -> Foreign
     serializeItemEntry ie =
       case ie of
-        FoodItem { name: ItemName name', note: ItemNote notes' } ->
+        FoodItem { name: ItemName name'
+                 , note: ItemNote note'
+                 } ->
           unsafeToForeign
             { _type: "FoodItem"
             , desc: name'
-            , note: notes'
+            , note: note'
             }
-        ConditionItem { name: ItemName name' } ->
+
+        ConditionItem { name: ItemName name'
+                      , note: ItemNote note'
+                      } ->
           unsafeToForeign
             { _type: "ConditionItem"
             , desc: name'
+            , note: note'
             }
-        SymptomItem { name: ItemName name' } ->
+
+        SymptomItem { name: ItemName name'
+                    , note: ItemNote note'
+                    } ->
           unsafeToForeign
             { _type: "SymptomItem"
             , desc: name'
+            , note: note'
             }
-        ActivityItem { name: ItemName name' } ->
+
+        ActivityItem { name: ItemName name'
+                     , note: ItemNote note'
+                     } ->
           unsafeToForeign
             { _type: "ActivityItem"
             , desc: name'
+            , note: note'
             }
+
         NoteItem { note: ItemNote note' } ->
           unsafeToForeign
             { _type: "NoteItem"
@@ -136,9 +151,9 @@ parseSavedState val =
 
     items <- readItems itemsF
 
-    pure  { nextId : nextId
-          , items: items
-          }
+    pure { nextId: nextId
+         , items: items
+         }
 
 readItems :: Array F.Foreign -> F.F (Array Item)
 readItems itemsF =
@@ -157,10 +172,12 @@ readItem itemF = do
   itemEntryF <- FI.readProp "entry" itemF
 
   entry <- readItemEntry itemEntryF
+
   pure { createdAt, key, entry }
 
 readItemEntry :: F.Foreign -> F.F ItemEntry
 readItemEntry itemEntryF = do
+  -- TODO rename _type to _constructor, more precise
   _type <- (FI.readProp "_type" >=> F.readString) itemEntryF
   case _type of
     "FoodItem" -> readFoodItem itemEntryF
@@ -171,25 +188,46 @@ readItemEntry itemEntryF = do
     _ -> readNoteItem itemEntryF
 
 
-readItemSimple :: (String -> ItemEntry) -> F.Foreign -> F.F ItemEntry
-readItemSimple ctor itemEntryF = do
-  txt <- (FI.readProp "desc" >=> F.readString) itemEntryF
-  pure $ ctor txt
-
+-- TODO rename txt/desc to name
 readFoodItem :: F.Foreign -> F.F ItemEntry
 readFoodItem itemEntryF = do
   txt <- (FI.readProp "desc" >=> F.readString) itemEntryF
   notes <- (FI.readProp "note" >=> F.readString) itemEntryF
-  pure $ FoodItem { name: ItemName txt, note: ItemNote notes }
+  pure $ FoodItem { name: ItemName txt
+                  , note: ItemNote notes
+                  }
+
+-- TODO see if i can figure out how to make a common read method
+--       for all of these ( Foreign -> {item, note})
 
 readConditionItem :: F.Foreign -> F.F ItemEntry
-readConditionItem = readItemSimple (\s -> ConditionItem { name: ItemName s })
+readConditionItem itemEntryF = do
+  txt <- (FI.readProp "desc" >=> F.readString) itemEntryF
+  notes <- (FI.readProp "note" >=> F.readString) itemEntryF
+  pure $ ConditionItem { name: ItemName txt
+                       , note: ItemNote notes
+                       }
 
 readSymptomItem :: F.Foreign -> F.F ItemEntry
-readSymptomItem = readItemSimple (\s -> SymptomItem { name: ItemName s })
+readSymptomItem itemEntryF = do
+  txt <- (FI.readProp "desc" >=> F.readString) itemEntryF
+  notes <- (FI.readProp "note" >=> F.readString) itemEntryF
+  pure $ SymptomItem { name: ItemName txt
+                     , note: ItemNote notes
+                     }
 
 readActivityItem :: F.Foreign -> F.F ItemEntry
-readActivityItem = readItemSimple (\s -> ActivityItem { name: ItemName s })
+readActivityItem itemEntryF = do
+  txt <- (FI.readProp "desc" >=> F.readString) itemEntryF
+  notes <- (FI.readProp "note" >=> F.readString) itemEntryF
+  pure $ ActivityItem { name: ItemName txt
+                      , note: ItemNote notes
+                      }
+
+readItemSimple :: (String -> ItemEntry) -> F.Foreign -> F.F ItemEntry
+readItemSimple ctor itemEntryF = do
+  txt <- (FI.readProp "desc" >=> F.readString) itemEntryF
+  pure $ ctor txt
 
 readNoteItem :: F.Foreign -> F.F ItemEntry
 readNoteItem = readItemSimple (\s -> NoteItem { note: ItemNote s })

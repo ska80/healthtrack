@@ -4,7 +4,7 @@ import Prelude
 
 import Data.Maybe (Maybe(..), maybe)
 import Effect (Effect)
-import HealthTrack.Model (ItemEntry(..), Item, ItemName(..))
+import HealthTrack.Model (ItemEntry(..), Item, ItemName(..), ItemNote(..))
 import HealthTrack.Util as Util
 import HealthTrack.ModelUtil as MU
 import React.Basic (StateUpdate(..), JSX, make, runUpdate, Component, createComponent, Self)
@@ -16,6 +16,7 @@ import Data.List as List
 import Data.List (List)
 import Data.Array as Array
 import HealthTrack.AutoComplete as AC
+import HealthTrack.CommonViews as CV
 
 comp :: Component Props
 comp = createComponent "AddActivityEntryScreen"
@@ -35,6 +36,7 @@ type Props =
 type State =
   { description :: Maybe String
   , autocompEntry :: Maybe AC.Entry
+  , note :: Maybe String
   }
 
 initialState :: Props -> State
@@ -43,7 +45,10 @@ initialState props =
     maybeItemEntry = _.entry <$> props.item
     description = maybeItemEntry >>= MU.itemEntryName
   in
-   { description, autocompEntry: Nothing }
+   { description
+   , autocompEntry: Nothing
+   , note: Nothing
+   }
 
 -- newOrEdit ::
 --   (ItemEntry -> Event Unit) ->
@@ -77,9 +82,13 @@ form props = make comp
               doSaveItem :: Self Props State -> Effect Unit
               doSaveItem self' = do
                 let
-                  name = maybe "" _.val self'.state.autocompEntry
+                  -- TODO see if i can make common funcions to extract
+                  -- e.g. self.state.autocompentry into an itemnote
+                  -- and reuse everywhere
+                  nextName = ItemName $ maybe "" _.val self'.state.autocompEntry
+                  nextNote = ItemNote $ maybe "" identity self'.state.note
                   nextEntry =
-                    ActivityItem $ { name: ItemName name }
+                    ActivityItem $ { name: nextName, note: nextNote }
                 maybe (self'.props.onEntryComplete nextEntry)
                       (flip self'.props.onEntryUpdate $ nextEntry)
                       self'.props.item
@@ -116,6 +125,10 @@ form props = make comp
         itemSelected entry =
           send self $ TextSelected entry
 
+        setNote tv =
+          self.setState _ { note = tv }
+
+        doSave = send self SaveItem
       in
        view { style: css { flexDirection: "column"
                          , padding: 50
@@ -128,9 +141,12 @@ form props = make comp
                      , children: [ string "Activity type:" ]
                      }
               , maybe autoCompWrapped activityTypeText self.state.autocompEntry
+
+              , CV.notesInput self.state.note setNote doSave
+
               , button { title: "save"
                        , key: "clickyButton"
-                       , onPress: (capture_ $ send self SaveItem )
+                       , onPress: capture_ doSave
                        }
               ]}
 

@@ -142,11 +142,39 @@ dispEntryItem val =
                               }
                        ]
            }
-    ConditionItem { name: ItemName name } ->
-      text { key: "val", children: [ string $ "Condition: " <> name ] }
-    SymptomItem  { name: ItemName name } ->
-      text { key: "val", children: [ string $ "Symptom: " <> name ] }
-    ActivityItem { name: ItemName name } ->
-      text { key: "val", children: [ string $ "Activity: " <> name ] }
+
+    ConditionItem { name: ItemName name, note: ItemNote notes } ->
+      view { key: "conditionItem"
+           , children: [ text { key: "name"
+                              , children: [ string $ "Condition: " <> name ]
+                              }
+                       , text { key: "notes"
+                              , children: [ string $ "Note: " <> notes ]
+                              }
+                       ]
+           }
+
+    SymptomItem { name: ItemName name, note: ItemNote notes } ->
+      view { key: "SymptomItem"
+           , children: [ text { key: "name"
+                              , children: [ string $ "Symptom: " <> name ]
+                              }
+                       , text { key: "notes"
+                              , children: [ string $ "Note: " <> notes ]
+                              }
+                       ]
+           }
+
+    ActivityItem { name: ItemName name, note: ItemNote notes } ->
+      view { key: "activityItem"
+           , children: [ text { key: "name"
+                              , children: [ string $ "Activity: " <> name ]
+                              }
+                       , text { key: "notes"
+                              , children: [ string $ "Note: " <> notes ]
+                              }
+                       ]
+           }
+
     NoteItem { note: ItemNote notes } ->
       text { key: "val", children: [ string  $ "Note: " <> notes ] }

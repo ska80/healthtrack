@@ -4,7 +4,7 @@ import Prelude
 
 import Data.Maybe (Maybe(..), maybe)
 import Effect (Effect)
-import HealthTrack.Model (ItemEntry(..), Item, ItemName(..))
+import HealthTrack.Model (ItemEntry(..), Item, ItemName(..), ItemNote(..))
 import HealthTrack.Util as Util
 import HealthTrack.ModelUtil as MU
 import React.Basic (StateUpdate(..), JSX, make, runUpdate, Component, createComponent, Self)
@@ -16,6 +16,7 @@ import Data.List as List
 import Data.List (List)
 import Data.Array as Array
 import HealthTrack.AutoComplete as AC
+import HealthTrack.CommonViews as CV
 
 comp :: Component Props
 comp = createComponent "AddConditionEntryScreen"
@@ -34,12 +35,16 @@ type Props =
 type State =
   { description :: Maybe String
   , selectedText :: Maybe AC.Entry
+  , note :: Maybe String
   }
 
 form :: Props -> JSX
 form props = make comp
   { render
-  , initialState: { description: Nothing, selectedText: Nothing }
+  , initialState: { description: Nothing
+                  , selectedText: Nothing
+                  , note: Nothing
+                  }
   } props
   where
     update :: Self Props State -> Action -> StateUpdate Props State
@@ -57,9 +62,11 @@ form props = make comp
               doSaveItem :: Self Props State -> Effect Unit
               doSaveItem self' = do
                 let
-                  name = maybe "" _.val self'.state.selectedText
+                  nextName = ItemName $ maybe "" _.val self'.state.selectedText
+                  nextNote = ItemNote $ maybe "" identity self'.state.note
                   nextEntry =
-                    ConditionItem { name: ItemName name}
+                    ConditionItem { name: nextName, note: nextNote }
+
                 self'.props.onEntryComplete nextEntry
 
     send = runUpdate update
@@ -94,6 +101,11 @@ form props = make comp
         itemSelected entry =
           send self $ TextSelected entry
 
+        setNote tv =
+          self.setState _ { note = tv }
+
+        doSave = send self SaveItem
+
       in
        view { style: css { flexDirection: "column"
                          , padding: 50
@@ -106,9 +118,12 @@ form props = make comp
                      , children: [ string "Condition type:" ]
                      }
               , maybe autoCompWrapped conditionTypeText self.state.selectedText
+
+              , CV.notesInput self.state.note setNote doSave
+
               , button { title: "save"
                        , key: "clickyButton"
-                       , onPress: (capture_ $ send self SaveItem )
+                       , onPress: capture_ doSave
                        }
               ]}
 

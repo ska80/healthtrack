@@ -40,7 +40,9 @@ type State =
 form :: Props -> JSX
 form props = make comp
   { render
-  , initialState: { selectedText: Nothing, note: Nothing }
+  , initialState: { selectedText: Nothing
+                  , note: Nothing
+                  }
   } props
   where
     update :: Self Props State -> Action -> StateUpdate Props State
@@ -59,9 +61,9 @@ form props = make comp
               doSaveItem self' = do
                 let
                   nextName = ItemName $ maybe "" _.val self'.state.selectedText
-                  nextNotes = ItemNote $ maybe "" identity self'.state.note
+                  nextNote = ItemNote $ maybe "" identity self'.state.note
                   nextEntry =
-                    FoodItem { name: nextName, note: nextNotes }
+                    FoodItem { name: nextName, note: nextNote }
                 self'.props.onEntryComplete nextEntry
 
     send = runUpdate update
@@ -112,13 +114,14 @@ form props = make comp
                      }
               , maybe autoCompWrapped foodTypeText self.state.selectedText
 
-              , CV.notesInput self.state.note setNote (send self SaveItem )
+              , CV.notesInput self.state.note setNote (send self SaveItem)
 
               , button { title: "save"
                        , key: "clickyButton"
                        , onPress: (capture_ $ send self SaveItem )
                        }
-              ]}
+              ]
+            }
 
 inputChangeHandler :: List AC.Entry -> Maybe String -> List AC.Entry -> Int -> Effect AC.Response
 inputChangeHandler foods' mtext _entries nextId =

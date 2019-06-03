@@ -62,14 +62,17 @@ type FoodData =
 
 type ConditionData =
   { name :: ItemName
+  , note :: ItemNote
   }
 
 type SymptomData =
   { name :: ItemName
+  , note :: ItemNote
   }
 
 type ActivityData =
   { name :: ItemName
+  , note :: ItemNote
   }
 
 type NoteData =
