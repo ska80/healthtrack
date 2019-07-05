@@ -186,39 +186,45 @@ readItemEntry itemEntryF = do
     "NoteItem" -> readNoteItem itemEntryF
     _ -> readNoteItem itemEntryF
 
+readStringProp :: String -> F.Foreign -> F.F String
+readStringProp name = (FI.readProp name >=> F.readString)
+
+readName :: F.Foreign -> F.F String
+readName = readStringProp "name"
+
+readNote :: F.Foreign -> F.F String
+readNote = readStringProp "note"
+
 readFoodItem :: F.Foreign -> F.F ItemEntry
 readFoodItem itemEntryF = do
-  name <- (FI.readProp "name" >=> F.readString) itemEntryF
-  notes <- (FI.readProp "note" >=> F.readString) itemEntryF
+  name <- readName itemEntryF
+  note <- readNote itemEntryF
   pure $ FoodItem { name: ItemName name
-                  , note: ItemNote notes
+                  , note: ItemNote note
                   }
-
--- TODO see if i can figure out how to make a common read method
---       for all of these ( Foreign -> {item, note})
 
 readConditionItem :: F.Foreign -> F.F ItemEntry
 readConditionItem itemEntryF = do
-  name <- (FI.readProp "name" >=> F.readString) itemEntryF
-  notes <- (FI.readProp "note" >=> F.readString) itemEntryF
+  name <- readName itemEntryF
+  note <- readNote itemEntryF
   pure $ ConditionItem { name: ItemName name
-                       , note: ItemNote notes
+                       , note: ItemNote note
                        }
 
 readSymptomItem :: F.Foreign -> F.F ItemEntry
 readSymptomItem itemEntryF = do
-  name <- (FI.readProp "name" >=> F.readString) itemEntryF
-  notes <- (FI.readProp "note" >=> F.readString) itemEntryF
+  name <- readName itemEntryF
+  note <- readNote itemEntryF
   pure $ SymptomItem { name: ItemName name
-                     , note: ItemNote notes
+                     , note: ItemNote note
                      }
 
 readActivityItem :: F.Foreign -> F.F ItemEntry
 readActivityItem itemEntryF = do
-  name <- (FI.readProp "name" >=> F.readString) itemEntryF
-  notes <- (FI.readProp "note" >=> F.readString) itemEntryF
+  name <- readName itemEntryF
+  note <- readNote itemEntryF
   pure $ ActivityItem { name: ItemName name
-                      , note: ItemNote notes
+                      , note: ItemNote note
                       }
 
 readItemSimple :: (String -> ItemEntry) -> F.Foreign -> F.F ItemEntry
