@@ -70,7 +70,7 @@ serializeItem item =
                  , note: ItemNote note'
                  } ->
           unsafeToForeign
-            { _type: "FoodItem"
+            { _constructor: "FoodItem"
             , desc: name'
             , note: note'
             }
@@ -79,7 +79,7 @@ serializeItem item =
                       , note: ItemNote note'
                       } ->
           unsafeToForeign
-            { _type: "ConditionItem"
+            { _constructor: "ConditionItem"
             , desc: name'
             , note: note'
             }
@@ -88,7 +88,7 @@ serializeItem item =
                     , note: ItemNote note'
                     } ->
           unsafeToForeign
-            { _type: "SymptomItem"
+            { _constructor: "SymptomItem"
             , desc: name'
             , note: note'
             }
@@ -97,14 +97,14 @@ serializeItem item =
                      , note: ItemNote note'
                      } ->
           unsafeToForeign
-            { _type: "ActivityItem"
+            { _constructor: "ActivityItem"
             , desc: name'
             , note: note'
             }
 
         NoteItem { note: ItemNote note' } ->
           unsafeToForeign
-            { _type: "NoteItem"
+            { _constructor: "NoteItem"
             , desc: unsafeToForeign note'
             }
   in
@@ -177,9 +177,8 @@ readItem itemF = do
 
 readItemEntry :: F.Foreign -> F.F ItemEntry
 readItemEntry itemEntryF = do
-  -- TODO rename _type to _constructor, more precise
-  _type <- (FI.readProp "_type" >=> F.readString) itemEntryF
-  case _type of
+  _constructor <- (FI.readProp "_constructor" >=> F.readString) itemEntryF
+  case _constructor of
     "FoodItem" -> readFoodItem itemEntryF
     "ConditionItem" -> readConditionItem itemEntryF
     "SymptomItem" -> readSymptomItem itemEntryF
