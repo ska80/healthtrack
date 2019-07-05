@@ -33,7 +33,7 @@ menu props' = makeStateless comp render props'
                    }
           , button { title: "View Entries"
                    , key: "ViewLogButton"
-                   , onPress: capture_ (props.onMenuClick ViewLogScreen)
+                   , onPress: capture_ (props.onMenuClick ListItemEntriesScreen)
                    }
           , button { title: "Developer"
                    , key: "DeveloperButton"

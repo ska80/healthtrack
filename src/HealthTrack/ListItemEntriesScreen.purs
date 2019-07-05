@@ -1,7 +1,4 @@
-module HealthTrack.ViewLogScreen where
-
--- TODO rename to somethiong better -- like a common rest thing
--- `ListItemsScreen` etc
+module HealthTrack.ListItemEntriesScreen where
 
 import Prelude
 
@@ -19,7 +16,7 @@ import Unsafe.Coerce (unsafeCoerce)
 import HealthTrack.Util (toListRenderItem, toFlatListPropsItemSeparatorComponent)
 
 comp :: Component Props
-comp = createComponent "ViewLogScreen"
+comp = createComponent "ListItemEntriesScreen"
 
 data Action
   = DeleteEntry Item

@@ -115,7 +115,7 @@ data Screen
   | AddItemScreen
   | EditItemScreen Item
   | DeveloperScreen
-  | ViewLogScreen
+  | ListItemEntriesScreen
 
 derive instance genericScreen :: Generic Screen _
 

@@ -98,14 +98,14 @@ logEntryScreen props = make comp
       nextState <- addItemEntryToAppState self'.state.appState itemEntry
       self'.setState $ _ { appState = nextState }
       props.onStateUpdate nextState
-      props.changeScreen ViewLogScreen
+      props.changeScreen ListItemEntriesScreen
 
     onEntryUpdate :: Self Props AddEntryScreenState -> Item -> ItemEntry -> Effect Unit
     onEntryUpdate {state, setState} item itemEntry = do
       nextState <- updateItemEntryInAppState state.appState item itemEntry
       setState $ _ { appState = nextState }
       props.onStateUpdate nextState
-      props.changeScreen ViewLogScreen
+      props.changeScreen ListItemEntriesScreen
 
 
     render self =
@@ -128,7 +128,7 @@ logEntryScreen props = make comp
                             , action: capture_ props.returnToMenuE
                             }
               , optionButton: { text: "Existing Entries"
-                              , action: capture_ (props.changeScreen ViewLogScreen)
+                              , action: capture_ (props.changeScreen ListItemEntriesScreen)
                               }
               }
           in

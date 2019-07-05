@@ -13,7 +13,7 @@ import HealthTrack.DeveloperScreen as DeveloperScreen
 import HealthTrack.MenuScreen as MenuScreen
 import HealthTrack.Model (AppState, Screen(..), initialState)
 import HealthTrack.Storage as Storage
-import HealthTrack.ViewLogScreen as ViewLogScreen
+import HealthTrack.ListItemEntriesScreen as ListItemEntriesScreen
 import React.Basic (Self, StateUpdate(..), JSX, make, runUpdate, Component, createComponent)
 
 comp :: Component {}
@@ -97,8 +97,8 @@ main = make comp
                                         , item: Just item
                                         }
 
-        ViewLogScreen ->
-          ViewLogScreen.viewLogScreen
+        ListItemEntriesScreen ->
+          ListItemEntriesScreen.viewLogScreen
             { returnToMenuE: changeScreen self MenuScreen
             , state: self.state
             , changeScreen: changeScreen self
