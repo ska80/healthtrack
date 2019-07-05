@@ -71,7 +71,7 @@ serializeItem item =
                  } ->
           unsafeToForeign
             { _constructor: "FoodItem"
-            , desc: name'
+            , name: name'
             , note: note'
             }
 
@@ -80,7 +80,7 @@ serializeItem item =
                       } ->
           unsafeToForeign
             { _constructor: "ConditionItem"
-            , desc: name'
+            , name: name'
             , note: note'
             }
 
@@ -89,7 +89,7 @@ serializeItem item =
                     } ->
           unsafeToForeign
             { _constructor: "SymptomItem"
-            , desc: name'
+            , name: name'
             , note: note'
             }
 
@@ -98,14 +98,14 @@ serializeItem item =
                      } ->
           unsafeToForeign
             { _constructor: "ActivityItem"
-            , desc: name'
+            , name: name'
             , note: note'
             }
 
         NoteItem { note: ItemNote note' } ->
           unsafeToForeign
             { _constructor: "NoteItem"
-            , desc: unsafeToForeign note'
+            , name: unsafeToForeign note'
             }
   in
    unsafeToForeign
@@ -186,13 +186,11 @@ readItemEntry itemEntryF = do
     "NoteItem" -> readNoteItem itemEntryF
     _ -> readNoteItem itemEntryF
 
-
--- TODO rename txt/desc to name
 readFoodItem :: F.Foreign -> F.F ItemEntry
 readFoodItem itemEntryF = do
-  txt <- (FI.readProp "desc" >=> F.readString) itemEntryF
+  name <- (FI.readProp "name" >=> F.readString) itemEntryF
   notes <- (FI.readProp "note" >=> F.readString) itemEntryF
-  pure $ FoodItem { name: ItemName txt
+  pure $ FoodItem { name: ItemName name
                   , note: ItemNote notes
                   }
 
@@ -201,32 +199,32 @@ readFoodItem itemEntryF = do
 
 readConditionItem :: F.Foreign -> F.F ItemEntry
 readConditionItem itemEntryF = do
-  txt <- (FI.readProp "desc" >=> F.readString) itemEntryF
+  name <- (FI.readProp "name" >=> F.readString) itemEntryF
   notes <- (FI.readProp "note" >=> F.readString) itemEntryF
-  pure $ ConditionItem { name: ItemName txt
+  pure $ ConditionItem { name: ItemName name
                        , note: ItemNote notes
                        }
 
 readSymptomItem :: F.Foreign -> F.F ItemEntry
 readSymptomItem itemEntryF = do
-  txt <- (FI.readProp "desc" >=> F.readString) itemEntryF
+  name <- (FI.readProp "name" >=> F.readString) itemEntryF
   notes <- (FI.readProp "note" >=> F.readString) itemEntryF
-  pure $ SymptomItem { name: ItemName txt
+  pure $ SymptomItem { name: ItemName name
                      , note: ItemNote notes
                      }
 
 readActivityItem :: F.Foreign -> F.F ItemEntry
 readActivityItem itemEntryF = do
-  txt <- (FI.readProp "desc" >=> F.readString) itemEntryF
+  name <- (FI.readProp "name" >=> F.readString) itemEntryF
   notes <- (FI.readProp "note" >=> F.readString) itemEntryF
-  pure $ ActivityItem { name: ItemName txt
+  pure $ ActivityItem { name: ItemName name
                       , note: ItemNote notes
                       }
 
 readItemSimple :: (String -> ItemEntry) -> F.Foreign -> F.F ItemEntry
 readItemSimple ctor itemEntryF = do
-  txt <- (FI.readProp "desc" >=> F.readString) itemEntryF
-  pure $ ctor txt
+  name <- (FI.readProp "name" >=> F.readString) itemEntryF
+  pure $ ctor name
 
 readNoteItem :: F.Foreign -> F.F ItemEntry
 readNoteItem = readItemSimple (\s -> NoteItem { note: ItemNote s })
