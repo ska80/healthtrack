@@ -17,6 +17,7 @@ import Data.List (List)
 import Data.Array as Array
 import HealthTrack.AutoComplete as AC
 import HealthTrack.CommonViews as CV
+-- import Debug.Trace (spy)
 
 comp :: Component Props
 comp = createComponent "AddFoodEntryScreen"

@@ -34,18 +34,20 @@ type Props =
   }
 
 type State =
-  { itemName :: Maybe AC.Entry
+  { itemName :: Maybe String
   , note :: Maybe String
   }
 
 initialState :: Props -> State
 initialState props =
   let
-    maybeItemEntry = _.entry <$> props.item
-    description = maybeItemEntry >>= MU.itemEntryName
+    maybeItemEntry = props.item <#> _.entry
+    itemName = maybeItemEntry >>= MU.itemEntryName
+    note :: Maybe String
+    note = (maybeItemEntry <#> MU.itemEntryNote)
   in
-   { itemName: Nothing
-   , note: Nothing
+   { itemName
+   , note
    }
 
 -- newOrEdit ::
@@ -70,7 +72,7 @@ form props = make comp
       case _ of
         TextSelected entry ->
           let
-            nextState = self.state { itemName = Just entry }
+            nextState = self.state { itemName = Just entry.val }
           in
            Update nextState
 
@@ -83,7 +85,7 @@ form props = make comp
                   -- TODO see if i can make common funcions to extract
                   -- e.g. self.state.itemName into an itemnote
                   -- and reuse everywhere
-                  nextName = ItemName $ maybe "" _.val self'.state.itemName
+                  nextName = ItemName $ maybe "" identity self'.state.itemName
                   nextNote = ItemNote $ maybe "" identity self'.state.note
                   nextEntry =
                     ActivityItem $ { name: nextName, note: nextNote }
@@ -115,9 +117,9 @@ form props = make comp
 
         allActivitySuggestions = activitySuggestions self.props.items
 
-        activityTypeText {val}=
+        activityTypeText name =
           text { key: "activity label"
-               , children: [ string $ val ]
+               , children: [ string $ name ]
                }
 
         itemSelected entry =
