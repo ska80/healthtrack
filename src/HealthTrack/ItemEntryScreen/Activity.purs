@@ -23,6 +23,7 @@ comp = createComponent "AddActivityEntryScreen"
 
 data Action
   = SaveItem
+  | ChangeName
   | TextSelected AC.Entry
 
 type Props =
@@ -36,6 +37,7 @@ type Props =
 type State =
   { itemName :: Maybe String
   , note :: Maybe String
+  , changeName :: Boolean
   }
 
 initialState :: Props -> State
@@ -48,6 +50,7 @@ initialState props =
   in
    { itemName
    , note
+   , changeName : false
    }
 
 -- newOrEdit ::
@@ -72,9 +75,15 @@ form props = make comp
       case _ of
         TextSelected entry ->
           let
-            nextState = self.state { itemName = Just entry.val }
+            nextState = self.state { itemName = Just entry.val
+                                   , changeName = false
+                                   }
           in
            Update nextState
+
+        ChangeName ->
+          Update self.state { changeName = true }
+
 
         SaveItem ->
           SideEffects doSaveItem
@@ -118,8 +127,16 @@ form props = make comp
         allActivitySuggestions = activitySuggestions self.props.items
 
         activityTypeText name =
-          text { key: "activity label"
-               , children: [ string $ name ]
+          view { children:
+                 [ text { key: "activity label"
+                        , children: [ string $ name ]
+                        }
+                 , button { title: "change"
+                          , key: "labelChangeButton"
+                          , onPress: capture_ (send self ChangeName)
+                          }
+                 ]
+
                }
 
         itemSelected entry =
@@ -128,7 +145,16 @@ form props = make comp
         setNote tv =
           self.setState _ { note = tv }
 
-        doSave = send self SaveItem
+        doSave =
+          send self SaveItem
+
+        activityNameElem :: JSX
+        activityNameElem =
+          case self.state.itemName of
+            Just name | not self.state.changeName ->
+              activityTypeText name
+            _ ->
+              autoCompWrapped
       in
        view { style: css { flexDirection: "column"
                          , padding: 50
@@ -140,7 +166,8 @@ form props = make comp
               [ text { key: "instructions"
                      , children: [ string "Activity type:" ]
                      }
-              , maybe autoCompWrapped activityTypeText self.state.itemName
+              , activityNameElem
+              -- , maybe autoCompWrapped activityTypeText self.state.itemName
 
               , CV.notesInput self.state.note setNote doSave
 
