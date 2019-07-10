@@ -17,6 +17,8 @@ import Data.List (List)
 import Data.Array as Array
 import HealthTrack.AutoComplete as AC
 import HealthTrack.CommonViews as CV
+import HealthTrack.ItemEntryScreen.Util as IU
+
 -- import Debug.Trace (spy)
 
 comp :: Component Props
@@ -34,16 +36,29 @@ type Props =
   }
 
 type State =
-  { selectedText :: Maybe AC.Entry
+  { itemName :: Maybe String
   , note :: Maybe String
+  , changeName :: Boolean
   }
+
+initialState :: Props -> State
+initialState props =
+  let
+    maybeItemEntry :: Maybe ItemEntry
+    maybeItemEntry = props.item <#> _.entry
+    itemName = maybeItemEntry >>= MU.itemEntryName
+    note :: Maybe String
+    note = (maybeItemEntry <#> MU.itemEntryNote)
+  in
+   { itemName
+   , note
+   , changeName : false
+   }
 
 form :: Props -> JSX
 form props = make comp
   { render
-  , initialState: { selectedText: Nothing
-                  , note: Nothing
-                  }
+  , initialState: IU.initialState props
   } props
   where
     update :: Self Props State -> Action -> StateUpdate Props State
@@ -51,7 +66,7 @@ form props = make comp
       case _ of
         TextSelected entry ->
           let
-            nextState = self.state { selectedText = Just entry}
+            nextState = self.state { itemName = Just entry.val}
           in
            Update nextState
 
@@ -61,7 +76,7 @@ form props = make comp
               doSaveItem :: Self Props State -> Effect Unit
               doSaveItem self' = do
                 let
-                  nextName = ItemName $ maybe "" _.val self'.state.selectedText
+                  nextName = ItemName $ maybe "" identity self'.state.itemName
                   nextNote = ItemNote $ maybe "" identity self'.state.note
                   nextEntry =
                     FoodItem { name: nextName, note: nextNote }
@@ -91,7 +106,7 @@ form props = make comp
 
         allFoodSuggestions = foodSuggestions self.props.items
 
-        foodTypeText {val} =
+        foodTypeText val =
           text { key: "food label"
                , children: [ string $ val]
                }
@@ -113,7 +128,7 @@ form props = make comp
               [ text { key: "instructions"
                      , children: [ string "Food type:" ]
                      }
-              , maybe autoCompWrapped foodTypeText self.state.selectedText
+              , maybe autoCompWrapped foodTypeText self.state.itemName
 
               , CV.notesInput self.state.note setNote (send self SaveItem)
 

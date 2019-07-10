@@ -6,6 +6,8 @@ import Data.Maybe (Maybe, maybe)
 import Effect (Effect)
 import Effect.Uncurried (EffectFn1)
 import HealthTrack.Util as Util
+import HealthTrack.Model (Item, ItemEntry)
+import HealthTrack.ModelUtil as MU
 import React.Basic (JSX)
 import React.Basic.DOM (css)
 import React.Basic.DOM.Events (capture_, capture)

@@ -2,21 +2,22 @@ module HealthTrack.ItemEntryScreen.Activity where
 
 import Prelude
 
+import Data.Array as Array
+import Data.List (List)
+import Data.List as List
 import Data.Maybe (Maybe(..), maybe)
+import Data.String as Str
 import Effect (Effect)
+import HealthTrack.AutoComplete as AC
+import HealthTrack.CommonViews as CV
+import HealthTrack.ItemEntryScreen.Util as IU
 import HealthTrack.Model (ItemEntry(..), Item, ItemName(..), ItemNote(..))
-import HealthTrack.Util as Util
 import HealthTrack.ModelUtil as MU
+import HealthTrack.Util as Util
 import React.Basic (StateUpdate(..), JSX, make, runUpdate, Component, createComponent, Self)
 import React.Basic.DOM (css)
 import React.Basic.DOM.Events (capture_)
 import React.Basic.Native (button, string, text, view)
-import Data.String as Str
-import Data.List as List
-import Data.List (List)
-import Data.Array as Array
-import HealthTrack.AutoComplete as AC
-import HealthTrack.CommonViews as CV
 
 comp :: Component Props
 comp = createComponent "AddActivityEntryScreen"
@@ -43,6 +44,7 @@ type State =
 initialState :: Props -> State
 initialState props =
   let
+    maybeItemEntry :: Maybe ItemEntry
     maybeItemEntry = props.item <#> _.entry
     itemName = maybeItemEntry >>= MU.itemEntryName
     note :: Maybe String
@@ -53,6 +55,7 @@ initialState props =
    , changeName : false
    }
 
+-- TODO finish this?
 -- newOrEdit ::
 --   (ItemEntry -> Event Unit) ->
 --   (ItemEntry -> Item -> Event Unit) ->
@@ -67,7 +70,7 @@ initialState props =
 form :: Props -> JSX
 form props = make comp
   { render
-  , initialState: initialState props
+  , initialState: IU.initialState props
   } props
   where
     update :: Self Props State -> Action -> StateUpdate Props State
